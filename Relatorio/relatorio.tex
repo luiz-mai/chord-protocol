@@ -1,0 +1,172 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Arsclassica Article
+% LaTeX Template
+% Version 1.1 (10/6/14)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Lorenzo Pantieri (http://www.lorenzopantieri.net) with extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+10pt, % Main document font size
+a4paper, % Paper type, use 'letterpaper' for US Letter paper
+oneside, % One page layout (no page indentation)
+%twoside, % Two page layout (page indentation for binding and different headers)
+headinclude,footinclude, % Extra spacing for the header and footer
+BCOR5mm, % Binding correction
+]{scrartcl}
+\usepackage[
+nochapters, % Turn off chapters since this is an article        
+beramono, % Use the Bera Mono font for monospaced text (\texttt)
+eulermath,% Use the Euler font for mathematics
+pdfspacing, % Makes use of pdftex’ letter spacing capabilities via the microtype package
+dottedtoc % Dotted lines leading to the page numbers in the table of contents
+]{classicthesis} % The layout is based on the Classic Thesis style
+
+\usepackage{arsclassica} % Modifies the Classic Thesis package
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+
+\usepackage[utf8]{inputenc} % Required for including letters with accents
+
+\usepackage{graphicx} % Required for including images
+\graphicspath{{Figures/}} % Set the default folder for images
+
+\usepackage{enumitem} % Required for manipulating the whitespace between and within lists
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{subfig} % Required for creating figures with multiple parts (subfigures)
+
+\usepackage{amsmath,amssymb,amsthm} % For including math equations, theorems, symbols, etc
+
+\usepackage{varioref} % More descriptive referencing
+
+\usepackage[portuguese]{babel}
+
+\usepackage{indentfirst}
+
+
+\newcommand*{\plogo}{\fbox{$\mathcal{PL}$}} % Generic publisher logo
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\newcommand*{\titleGM}{\begingroup % Create the command for including the title page in the document
+\hbox{ % Horizontal box
+\hspace*{0.2\textwidth} % Whitespace to the left of the title page
+\rule{1pt}{\textheight} % Vertical line
+\hspace*{0.05\textwidth} % Whitespace between the vertical line and title page text
+\parbox[b]{0.85\textwidth}{ % Paragraph box which restricts text to less than the width of the page
+
+{\noindent\Huge\bfseries Programação em Socket para Redes P2P}\\[2\baselineskip] % Title
+{\Large \textsc{Luiz Felipe Ferreira Mai}}\\[\baselineskip] % Author name
+{\Large \textsc{Matheus Salgueiro Castanho}} % Author name
+
+\vspace{0.5\textheight} % Whitespace between the title block and the publisher
+}}
+\endgroup}
+%----------------------------------------------------------------------------------------
+%	THEOREM STYLES
+%---------------------------------------------------------------------------------------
+
+\theoremstyle{definition} % Define theorem styles here based on the definition style (used for definitions and examples)
+\newtheorem{definition}{Definition}
+
+\theoremstyle{plain} % Define theorem styles here based on the plain style (used for theorems, lemmas, propositions)
+\newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark} % Define theorem styles here based on the remark style (used for remarks and notes)
+
+%----------------------------------------------------------------------------------------
+%	HYPERLINKS
+%---------------------------------------------------------------------------------------
+
+\hypersetup{
+%draft, % Uncomment to remove all links (useful for printing in black and white)
+colorlinks=true, breaklinks=true, bookmarks=true,bookmarksnumbered,
+urlcolor=webbrown, linkcolor=RoyalBlue, citecolor=webgreen, % Link colors
+pdftitle={}, % PDF title
+pdfauthor={\textcopyright}, % PDF Author
+pdfsubject={}, % PDF Subject
+pdfkeywords={}, % PDF Keywords
+pdfcreator={pdfLaTeX}, % PDF Creator
+pdfproducer={LaTeX with hyperref and ClassicThesis} % PDF producer
+}
+\hyphenation{Fortran hy-phen-ation} % Specify custom hyphenation points in words with dashes where you would like hyphenation to occur, or alternatively, don't put any dashes in a word to stop hyphenation altogether
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+
+\titleGM % This command includes the title page
+%----------------------------------------------------------------------------------------
+%	HEADERS
+%----------------------------------------------------------------------------------------
+
+\renewcommand{\sectionmark}[1]{\markright{\spacedlowsmallcaps{#1}}} % The header for all pages (oneside) or for even pages (twoside)
+%\renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} % Uncomment when using the twoside option - this modifies the header on odd pages
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}} % The header style
+
+\pagestyle{scrheadings} % Enable the headers specified in this block
+
+%----------------------------------------------------------------------------------------
+%	TABLE OF CONTENTS & LISTS OF FIGURES AND TABLES
+%----------------------------------------------------------------------------------------
+
+
+\setcounter{tocdepth}{2} % Set the depth of the table of contents to show sections and subsections only
+
+\tableofcontents % Print the table of contents
+
+\newpage
+
+\listoffigures % Print the list of figures
+
+\newpage
+
+\listoftables % Print the list of tables
+
+\newpage
+
+\section{Introdução}
+
+A história do Peer-to-Peer começou em 1999 quando o estudante de 18 anos, Shawn Fanning, deixou a faculdade no primeiro semestre para se dedicar ao Napster, que futuramente ficou conhecido como o software de crescimento mais rápido de toda a história da Internet.
+
+A ideia que fez com que o Napster se tornasse esse fenômeno foi o fato de que ele fornecia P2P gratuitamente a todos os seus usuários, bastando baixar o software pela Internet, instalá-lo e procurar por uma música para obtê-la gratuitamente. Apesar de ter sido uma revolução para os utilizadores da Internet, o rápido crescimento do Napster se tornou uma grande preocupação para as empresas fonográficas ao redor do mundo e, em 13 de abril de 2000, logo após o lançamento de seu último álbum, a banda Metallica abriu um processo contra o Napster por ter infringido a lei de direitos autorais. Após uma longa batalha judicial as partes chegam a um acordo em 25 de setembro de 2001: o Napster devia 26 milhões de dólares para autores e gravadoras, além de uma porcentagem de tudo o que o sistema arrecadasse até o início de 2003.
+
+Embora tenha tido um fim trágico, o Napster incentivou o aparecimento demuitos outros sistemas P2P como Gnutela, KaZaa e WinMP. Aplicações P2P se tornaram cada vez mais comuns e conhecidas pelo público e o mundo do P2P passou a ser muito mais do que apenas a troca de músicas no formato MP3.
+
+\newpage
+
+\section{Fundamentação Teórica} 
+
+
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\renewcommand{\refname}{\spacedlowsmallcaps{References}} % For modifying the bibliography heading
+
+\bibliographystyle{unsrt}
+
+\bibliography{sample.bib} % The file containing the bibliography
+
+%----------------------------------------------------------------------------------------
+
+\end{document}

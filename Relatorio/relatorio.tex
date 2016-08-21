@@ -59,6 +59,7 @@ dottedtoc % Dotted lines leading to the page numbers in the table of contents
 \usepackage{indentfirst}
 
 
+
 \newcommand*{\plogo}{\fbox{$\mathcal{PL}$}} % Generic publisher logo
 
 %----------------------------------------------------------------------------------------
@@ -72,7 +73,7 @@ dottedtoc % Dotted lines leading to the page numbers in the table of contents
 \hspace*{0.05\textwidth} % Whitespace between the vertical line and title page text
 \parbox[b]{0.85\textwidth}{ % Paragraph box which restricts text to less than the width of the page
 
-{\noindent\Huge\bfseries Programação em Socket para Redes P2P}\\[2\baselineskip] % Title
+{\noindent\Huge\bfseries LCast: um serviço de localização em redes P2P}\\[2\baselineskip] % Title
 {\Large \textsc{Luiz Felipe Ferreira Mai}}\\[\baselineskip] % Author name
 {\Large \textsc{Matheus Salgueiro Castanho}} % Author name
 
@@ -143,6 +144,11 @@ pdfproducer={LaTeX with hyperref and ClassicThesis} % PDF producer
 
 \newpage
 
+
+%----------------------------------------------------------------------------------------
+%	INTRODUÇÃO
+%----------------------------------------------------------------------------------------
+
 \section{Introdução}
 
 A história do Peer-to-Peer começou em 1999 quando o estudante de 18 anos, Shawn Fanning, deixou a faculdade no primeiro semestre para se dedicar ao Napster, que futuramente ficou conhecido como o software de crescimento mais rápido de toda a história da Internet.
@@ -153,9 +159,64 @@ Embora tenha tido um fim trágico, o Napster incentivou o aparecimento demuitos 
 
 \newpage
 
-\section{Fundamentação Teórica} 
+%----------------------------------------------------------------------------------------
+%	FUNDAMENTAÇÃO TEÓRICA
+%----------------------------------------------------------------------------------------
+
+\section{Fundamentação Teórica - Protocolo Chord}
+
+\subsection{O que é Peer-to-Peer?}
+
+\subsection{O protocolo Chord e sua implementação}
+
+\subsection{A solução para o problema da concorrência no protocolo Chord}
+
+\subsection{O protocolo Chord na prática}
+
+\newpage
+
+%----------------------------------------------------------------------------------------
+%	LCAST - TEORIA
+%----------------------------------------------------------------------------------------
+
+\section{Sobre o LCast}
+
+\subsection{Visão Geral}
+
+\subsection{Modelagem}
+
+\subsection{Implementação}
+
+\newpage
 
 
+
+%----------------------------------------------------------------------------------------
+%	LCAST - PRÁTICA
+%----------------------------------------------------------------------------------------
+
+\section{Utilizando o LCast}
+
+\subsection{Experimento 1: ...}
+
+\subsubsection{Descrição do teste}
+\subsubsection{Resultados}
+
+\subsection{Experimento 2: ...}
+
+\subsubsection{Descrição do teste}
+\subsubsection{Resultados}
+
+\subsection{Experimento 3: ...}
+
+\subsubsection{Descrição do teste}
+\subsubsection{Resultados}
+
+\newpage
+
+\section{Conclusão}
+
+\newpage
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
@@ -163,9 +224,24 @@ Embora tenha tido um fim trágico, o Napster incentivou o aparecimento demuitos 
 
 \renewcommand{\refname}{\spacedlowsmallcaps{References}} % For modifying the bibliography heading
 
-\bibliographystyle{unsrt}
+\begin{thebibliography}{1}
 
-\bibliography{sample.bib} % The file containing the bibliography
+  \bibitem{notes} John W. Dower {\em Readings compiled for History
+  21.479.}  1991.
+
+  \bibitem{impj}  The Japan Reader {\em Imperial Japan 1800-1945} 1973:
+  Random House, N.Y.
+
+  \bibitem{norman} E. H. Norman {\em Japan's emergence as a modern
+  state} 1940: International Secretariat, Institute of Pacific
+  Relations.
+
+  \bibitem{fo} Bob Tadashi Wakabayashi {\em Anti-Foreignism and Western
+  Learning in Early-Modern Japan} 1986: Harvard University Press.
+
+\end{thebibliography}
+
+
 
 %----------------------------------------------------------------------------------------
 

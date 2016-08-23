@@ -1,3 +1,13 @@
-#root{
+#splashScreen, #mainMenu{
+	-fx-background-image: url("../../resources/images/bg-v.jpg");
+}
+
+#outerbox{
 	-fx-background-image: url("../../resources/images/bg-h.jpg");
+}
+
+#sidebar{
+	-fx-border-style: solid inside;  
+    -fx-border-width: 1;
+    -fx-border-color: white;
 }

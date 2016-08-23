@@ -56,6 +56,7 @@ public class Main extends Application {
         Scene scene = new Scene(splashScreen, 338, 600);
         scene.getStylesheets().add("css/style.css");
         mainStage.setScene(scene);
+        mainStage.centerOnScreen();
         //FIM - SPLASH SCREEN
         
         
@@ -80,37 +81,12 @@ public class Main extends Application {
 		image = new Image(input);
 		ImageView createButton = new ImageView(image);
 		createButton.setId("create-button");
-		createButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-			//CLICOU NO BOTÃO DE "CRIAR REDE"
-		     @Override
-		     public void handle(MouseEvent event) {
-		         System.out.println("Criou rede");
-		         event.consume();
-		     }
-		});
 		buttons.getChildren().add(createButton);
 
 		input = new FileInputStream("resources/images/join_button.png");
 		image = new Image(input);
 		ImageView joinButton = new ImageView(image);
 		joinButton.setId("join-button");
-		joinButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-			//CLICOU NO BOTÃO DE "ENTRAR NA REDE"
-		     @Override
-		     public void handle(MouseEvent event) {
-		    	 TextInputDialog dialog = new TextInputDialog();
-		    	 dialog.setHeaderText("");
-		         dialog.setTitle("Entrar em uma rede");
-		         dialog.setContentText("Por favor, digite o IP de um dos membros da rede:");
-		         
-		         
-		         Optional<String> result = dialog.showAndWait();
-		         if (result.isPresent()){
-		             System.out.println("IP digitado: " + result.get());
-		         }
-		         event.consume();
-		     }
-		});
 		buttons.getChildren().add(joinButton);
 		vbox.getChildren().add(buttons);
 		//FIM - MAIN MENU
@@ -127,47 +103,113 @@ public class Main extends Application {
 		labelIds.setTextAlignment(TextAlignment.CENTER);
 		labelIds.setFill(Color.WHITE);
 		labelIds.setFont(new Font(20));
-		ScrollPane idList = new ScrollPane();
-		ListView<String> list = new ListView<String>();
-	    ObservableList<String> items = FXCollections.observableArrayList(
-	            "Single", "Double", "Suite", "Family App");
-	    list.setItems(items);
-	    idList.prefWidthProperty().bind(list.widthProperty());
-	    idList.prefHeightProperty().bind(list.heightProperty());
-	    idList.setContent(list);
-	    idList.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-	    idList.setMaxHeight(220);
-	    idList.setMinHeight(220);
+		ScrollPane idScroll = new ScrollPane();
+		idScroll.setFitToWidth(true);		
+		ListView<String> idList = new ListView<String>();
+	    ObservableList<String> ids = FXCollections.observableArrayList(
+	            "ID 1", "ID 2", "ID 3", "ID 4");
+	    idList.setItems(ids);
+	    idScroll.prefWidthProperty().bind(idList.widthProperty());
+	    idScroll.prefHeightProperty().bind(idList.heightProperty());
+	    idScroll.setContent(idList);
+	    idScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+	    idScroll.setMaxHeight(220);
+	    idScroll.setMinHeight(220);
 
 		VBox idsBox = new VBox(labelIds, idList);
 		idsBox.setAlignment(Pos.CENTER);
 		
 
-		VBox sidebar = new VBox(50, mainLogo, idsBox);
+	    input = new FileInputStream("resources/images/leave_button.png");
+		image = new Image(input);
+		ImageView leaveButton = new ImageView(image);
+		
+
+		VBox sidebar = new VBox(80, mainLogo, idsBox, leaveButton );
 		sidebar.setId("sidebar");
 		sidebar.setMaxWidth(300);
 		sidebar.setPadding(new Insets(30));
 		sidebar.setAlignment(Pos.TOP_CENTER);
 		
-		VBox mainContent = new VBox();
-		HBox outerBox = new HBox(50, sidebar, mainContent);
+		Text messagesLabel = new Text("MENSAGENS:");
+		messagesLabel.setTextAlignment(TextAlignment.CENTER);
+		messagesLabel.setFill(Color.WHITE);
+		messagesLabel.setFont(new Font(20));
+		ScrollPane messagesScroll = new ScrollPane();
+		messagesScroll.setFitToWidth(true);		
+		ListView<String> messagesList = new ListView<String>();
+	    ObservableList<String> messages = FXCollections.observableArrayList(
+	            "Mensagem 1", "Mensagem 2", "Mensagem 3", "Mensagem 4");
+	    messagesList.setItems(messages);
+	    messagesList.setMinHeight(525);
+	    messagesScroll.prefWidthProperty().bind(messagesList.widthProperty());
+	    messagesScroll.prefHeightProperty().bind(messagesList.heightProperty());
+	    messagesScroll.setContent(messagesList);
+	    messagesScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+	    messagesScroll.setMaxHeight(525);
+	    messagesScroll.setMinHeight(525);
+	    messagesScroll.setMinWidth(620);
+		VBox mainContent = new VBox(messagesLabel, messagesScroll);
+		mainContent.setPadding(new Insets(20,15, 20, 10));
+
+		HBox outerBox = new HBox(25, sidebar, mainContent);
 		outerBox.setId("outerbox");
 		Scene scene3 = new Scene(outerBox, 1000, 600);
         scene3.getStylesheets().add("css/style.css");
 		//FIM - TELA PRINCIPAL
         
 		//INICIO - TRANSIÇÃO DA SPLASH SCREEN PARA MAIN MENU
-	/*	Timeline timeline = new Timeline();
+		Timeline timeline = new Timeline();
 		timeline.setDelay(new Duration(2000));
         KeyFrame key = new KeyFrame(Duration.millis(800),
                        new KeyValue (logo.opacityProperty(), 0)); 
         timeline.getKeyFrames().add(key);   
         timeline.setOnFinished((ae) -> 
         							mainStage.setScene(scene2)); 
-        timeline.play();*/
+       								mainStage.centerOnScreen();
+        timeline.play();
 		//FIM - TRANSIÇÃO DA SPLASH SCREEN PARA MAIN MENU
         
-        mainStage.setScene(scene3);
+        joinButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			//CLICOU NO BOTÃO DE "ENTRAR NA REDE"
+		     @Override
+		     public void handle(MouseEvent event) {
+		    	 TextInputDialog dialog = new TextInputDialog();
+		    	 dialog.setHeaderText("");
+		         dialog.setTitle("Entrar em uma rede");
+		         dialog.setContentText("Por favor, digite o IP de um dos membros da rede:");
+		         
+		         
+		         Optional<String> result = dialog.showAndWait();
+		         if (result.isPresent()){
+		             System.out.println("IP digitado: " + result.get());
+		         }
+		         event.consume();
+		     }
+		});
+        
+        createButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			//CLICOU NO BOTÃO DE "CRIAR REDE"
+		     @Override
+		     public void handle(MouseEvent event) {
+		         mainStage.setScene(scene3);
+		         mainStage.centerOnScreen();
+		         event.consume();
+		     }
+		});
+        
+        leaveButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			//CLICOU NO BOTÃO DE "DEIXAR REDE"
+		     @Override
+		     public void handle(MouseEvent event) {
+	             System.out.println("Deixou a rede.");
+	             mainStage.close();
+		         event.consume();
+		     }
+		});
+        
+        mainStage.setScene(scene);
+        mainStage.centerOnScreen();
         mainStage.show();
 	}
 }

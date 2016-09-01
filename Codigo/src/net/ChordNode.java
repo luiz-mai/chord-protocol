@@ -101,28 +101,28 @@ public class ChordNode extends Thread {
 
 				switch(code){
 					//Join
-					case (byte)0b0000_0000:
+					case ChordPacket.JOIN_CODE:
 						break;
 					//Join Response
-					case (byte)0b1000_0000:
+					case ChordPacket.JOIN_RESP_CODE:
 						break;
 					//Leave
-					case (byte)0b0000_0001:
+					case ChordPacket.LEAVE_CODE:
 						break;
 					//LeaveResponse
-					case (byte)0b1000_0001:
+					case ChordPacket.LEAVE_RESP_CODE:
 						break;
 					//Lookup
-					case (byte)0b0000_0010:
+					case ChordPacket.LOOKUP_CODE:
 						break;
 					//LookupResponse
-					case (byte)0b1000_0010:
+					case ChordPacket.LOOKUP_RESP_CODE:
 						break;
 					//Update
-					case (byte)0b0000_0011:
+					case ChordPacket.UPDATE_CODE:
 						break;
 					//UpdateResponse
-					case (byte)0b1000_0011:
+					case ChordPacket.UPDATE_RESP_CODE:
 						break;
 				}	
 				

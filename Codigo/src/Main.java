@@ -203,7 +203,8 @@ public class Main extends Application {
 		     @Override
 		     public void handle(MouseEvent event) {
 	             System.out.println("Deixou a rede.");
-	             mainStage.close();
+	             mainStage.setScene(scene2);
+	             mainStage.centerOnScreen();
 		         event.consume();
 		     }
 		});

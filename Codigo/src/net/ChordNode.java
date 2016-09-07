@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.nio.ByteBuffer;
 
 import misc.Tools;
-import sun.net.InetAddressCachePolicy;
 
 
 public class ChordNode extends Thread {
@@ -123,24 +120,38 @@ public class ChordNode extends Thread {
 						break;
 					//Join Response
 					case ChordPacket.JOIN_RESP_CODE:
+						JoinResponsePacket jrp = new JoinResponsePacket(buffer,offset);
+						jrp.handle();
 						break;
 					//Leave
 					case ChordPacket.LEAVE_CODE:
+						LeavePacket lp = new LeavePacket(buffer,offset);
+						lp.handle();
 						break;
 					//LeaveResponse
 					case ChordPacket.LEAVE_RESP_CODE:
+						LeaveResponsePacket lrp = new LeaveResponsePacket(buffer,offset);
+						lrp.handle();
 						break;
 					//Lookup
 					case ChordPacket.LOOKUP_CODE:
+						LookupPacket lkp = new LookupPacket(buffer,offset);
+						lkp.handle();
 						break;
 					//LookupResponse
 					case ChordPacket.LOOKUP_RESP_CODE:
+						LookupResponsePacket lkrp = new LookupResponsePacket(buffer,offset);
+						lkrp.handle();
 						break;
 					//Update
 					case ChordPacket.UPDATE_CODE:
+						UpdatePacket up = new UpdatePacket(buffer,offset);
+						up.handle();
 						break;
 					//UpdateResponse
 					case ChordPacket.UPDATE_RESP_CODE:
+						UpdateResponsePacket urp = new UpdateResponsePacket(buffer,offset);
+						urp.handle();
 						break;
 				}	
 				

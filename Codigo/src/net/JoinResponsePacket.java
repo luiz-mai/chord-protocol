@@ -17,6 +17,10 @@ public class JoinResponsePacket extends ChordPacket{
 	private int predecessorID;
 	private int predecessorIp;
 	
+	public JoinResponsePacket (byte[] buffer, int offset){
+		
+	}
+	
 	public JoinResponsePacket (DatagramSocket socket, Inet4Address incomingIp,
 			int sucessorID, int sucessorIp, int predecessorID, int predecessorIp){
 		

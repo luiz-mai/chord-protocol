@@ -106,52 +106,43 @@ public class ChordNode extends Thread {
 				switch(code){
 					//Join
 					case ChordPacket.JOIN_CODE:
-						if(this.sucessor == null && this.predecessor == null){
-							//Único nó da rede
-							new JoinResponsePacket(socket,
-												   incomingIp,
-												   this.getID(),
-												   Tools.ipToInt(this.getIp()),
-												   this.getID(),
-												   Tools.ipToInt(this.getIp()));
-						} else {
-							//BUSCAR NA REDE
-						}
+						JoinPacket jp = new JoinPacket(buffer,offset);
+						handleJoin(jp);
 						break;
 					//Join Response
 					case ChordPacket.JOIN_RESP_CODE:
 						JoinResponsePacket jrp = new JoinResponsePacket(buffer,offset);
-						jrp.handle();
+						handleJoinResponse(jrp);
 						break;
 					//Leave
 					case ChordPacket.LEAVE_CODE:
 						LeavePacket lp = new LeavePacket(buffer,offset);
-						lp.handle();
+						handleLeave(lp);
 						break;
 					//LeaveResponse
 					case ChordPacket.LEAVE_RESP_CODE:
 						LeaveResponsePacket lrp = new LeaveResponsePacket(buffer,offset);
-						lrp.handle();
+						handleLeaveResponse(lrp);
 						break;
 					//Lookup
 					case ChordPacket.LOOKUP_CODE:
 						LookupPacket lkp = new LookupPacket(buffer,offset);
-						lkp.handle();
+						handleLookup(lkp);
 						break;
 					//LookupResponse
 					case ChordPacket.LOOKUP_RESP_CODE:
 						LookupResponsePacket lkrp = new LookupResponsePacket(buffer,offset);
-						lkrp.handle();
+						handleLookupResponse(lkrp);
 						break;
 					//Update
 					case ChordPacket.UPDATE_CODE:
 						UpdatePacket up = new UpdatePacket(buffer,offset);
-						up.handle();
+						handleUpdate(up);
 						break;
 					//UpdateResponse
 					case ChordPacket.UPDATE_RESP_CODE:
 						UpdateResponsePacket urp = new UpdateResponsePacket(buffer,offset);
-						urp.handle();
+						handleUpdateResponse(urp);
 						break;
 				}	
 				
@@ -164,35 +155,48 @@ public class ChordNode extends Thread {
 		}
 	}
 	
-	public void parseJoin() {
-		
+	
+	public void handleJoin(JoinPacket jp) {
+		if(this.sucessor == null && this.predecessor == null){
+			//Único nó da rede
+			new JoinResponsePacket(socket,
+								   incomingIp,
+								   this.getID(),
+								   Tools.ipToInt(this.getIp()),
+								   this.getID(),
+								   Tools.ipToInt(this.getIp()));
+		} else {
+			//BUSCAR NA REDE
+		}
 	}
 	
-	public void handleJoin() {
-
-	}
-
-	public void parseLeave() {
+	public void handleJoinResponse(JoinResponsePacket jrp) {
 		
 	}
 
-	public void handleLeave() {
 
-	}
+	public void handleLeave(LeavePacket lp) {
 
-	public void parseLookup() {
-		
 	}
 	
-	public void handleLookup() {
+	public void handleLeaveResponse(LeaveResponsePacket lrp) {
 
 	}
 
-	public void parseUpdate() {
-		
+	
+	public void handleLookup(LookupPacket lp) {
+
 	}
 	
-	public void handleUpdate() {
+	public void handleLookupResponse(LookupResponsePacket lrp) {
+
+	}
+	
+	public void handleUpdate(UpdatePacket up) {
+
+	}
+	
+	public void handleUpdateResponse(UpdateResponsePacket urp) {
 
 	}
 

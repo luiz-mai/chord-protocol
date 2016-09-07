@@ -55,6 +55,12 @@ public class JoinResponsePacket extends ChordPacket{
 		}
 		
 	}
+	
+	@Override
+	public byte[] toByteArray(){
+		
+	}
+
 
 	public String toString(){
 		//TODO toString();

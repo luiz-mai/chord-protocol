@@ -8,9 +8,7 @@ public class LeavePacket extends ChordPacket {
 	}
 	
 	@Override
-	void handle() {
-		// TODO Auto-generated method stub
-
+	public byte[] toByteArray(){
+		
 	}
-
 }

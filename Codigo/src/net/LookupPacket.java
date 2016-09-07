@@ -31,9 +31,11 @@ public class LookupPacket extends ChordPacket{
 		this.wantedID = java.nio.ByteBuffer.wrap(lido).getInt();
 	}
 	
-	void handle(){
+	@Override
+	public byte[] toByteArray(){
 		
 	}
+
 
 	public String toString(){
 		StringBuilder sb = new StringBuilder().append(String.format("%02x",this.code)).append(String.format("%08x",this.originID)).append(String.format("%08x",this.originIp)).append(String.format("%08x",this.wantedID));

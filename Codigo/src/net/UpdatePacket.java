@@ -7,9 +7,9 @@ public class UpdatePacket extends ChordPacket {
 	}
 	
 	@Override
-	void handle() {
-		// TODO Auto-generated method stub
-
+	public byte[] toByteArray(){
+		
 	}
+
 
 }

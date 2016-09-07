@@ -12,8 +12,8 @@ public abstract class ChordPacket {
 	public static final byte UPDATE_RESP_CODE = (byte) 0b1000_0011;
 	
 	protected byte code;
-		
-	abstract void handle();
+	
+	abstract public byte[] toByteArray();
 	
 	public byte getCode() {
 		return code;

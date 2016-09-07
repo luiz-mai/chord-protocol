@@ -50,10 +50,6 @@ public class LookupResponsePacket extends ChordPacket {
 				.putInt(sucessorIp)
 				.array();
 	}
-	
-	@Override
-	public byte[] toByteArray(){
-		return new byte[1];
-	}
+
 
 }

@@ -1,11 +1,15 @@
 package net;
 
 import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
 
 public class JoinPacket extends ChordPacket {
 
 	private int newNodeID;
 
+	public static final int packetSize = 5;
+
+	// Construtor para a criação de um pacote Join recebido
 	public JoinPacket(byte[] buffer, int offset) {
 
 		byte lido[] = new byte[4];
@@ -18,18 +22,27 @@ public class JoinPacket extends ChordPacket {
 
 		// Le 4 bytes do buffer (newNodeID)
 		bais.read(lido, offset, 4);
-		this.newNodeID = java.nio.ByteBuffer.wrap(lido).getInt();
+		this.newNodeID = ByteBuffer.wrap(lido).getInt();
 	}
 	
+	
+	// Construtor para a criação de um pacote Join para envio
+	public JoinPacket(int newNodeID) {
+		super();
+		this.code = ChordPacket.JOIN_CODE;
+		this.newNodeID = newNodeID;
+	}
+
 	@Override
-	public byte[] toByteArray(){
-	
+	public byte[] toByteArray() {
+		return ByteBuffer.allocate(40)
+				.put(this.code)
+				.putInt(newNodeID)
+				.array();
 	}
-	
+
 	public String toString() {
-		StringBuilder sb = new StringBuilder().append(String.format("%02x", this.code))
-				.append(String.format("%08x", this.newNodeID));
-		return sb.toString();
+		return String.format("code: %b \nnewNodeID: %d\n\n", this.code, this.newNodeID);
 	}
 
 }

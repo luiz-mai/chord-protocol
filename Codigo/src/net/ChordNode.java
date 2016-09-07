@@ -7,7 +7,7 @@ import java.net.Inet4Address;
 
 public class ChordNode extends Thread {
 
-	// Na especificação o ID deve ser de 32 bits, que é o tamanho exato do tipo
+	// Na especificaï¿½ï¿½o o ID deve ser de 32 bits, que ï¿½ o tamanho exato do tipo
 	// int em Java
 	private int ID;
 	private Inet4Address ip;
@@ -18,10 +18,10 @@ public class ChordNode extends Thread {
 	// Constante com a porta UDP a ser usada no protocolo
 	public static final int UDP_PORT = 12233;
 
-	// Variável que define se a thread do servidor deve continuar rodando
+	// Variï¿½vel que define se a thread do servidor deve continuar rodando
 	public boolean listen = true;
 
-	// Construtor para criar o nó local
+	// Construtor para criar o nï¿½ local
 	public ChordNode(int id, Inet4Address ip, ChordNode sucessor, ChordNode predecessor) throws IOException {
 		super();
 		this.ID = id;
@@ -79,10 +79,10 @@ public class ChordNode extends Thread {
 		while (listen) {
 			try {
 
-				// O tamanho do buffer para os pacotes é de 21 bytes pois esse é
-				// tamanho do maior pacote previsto pela aplicação: um envio da
+				// O tamanho do buffer para os pacotes ï¿½ de 21 bytes pois esse ï¿½
+				// tamanho do maior pacote previsto pela aplicaï¿½ï¿½o: um envio da
 				// funcionalidade Leave.
-				byte[] buffer = new byte[21];
+				byte[] buffer = new byte[128];
 
 				// Esperar o recebimento de um pacote
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -92,16 +92,18 @@ public class ChordNode extends Thread {
 
 				// TODO Remover: Imagino que a info do pacote nesse momento
 				// esteja salva no array buffer. Espero que isso seja correto xD
-				
-				// Capturar o offset do pacote no buffer pra saber onde começar a ler
+
+				// Capturar o offset do pacote no buffer pra saber onde comeï¿½ar a ler
 				int offset = packet.getOffset();
-				
+
 				// Pegando o codigo do pacote (primeiro byte)
 				byte code = buffer[offset];
 
 				switch(code){
 					//Join
 					case ChordPacket.JOIN_CODE:
+						JoinPacket jp = new JoinPacket(buffer,offset);
+						jp.handle();
 						break;
 					//Join Response
 					case ChordPacket.JOIN_RESP_CODE:
@@ -124,9 +126,9 @@ public class ChordNode extends Thread {
 					//UpdateResponse
 					case ChordPacket.UPDATE_RESP_CODE:
 						break;
-				}	
-				
-				
+				}
+
+
 			} catch (IOException e) {
 				e.printStackTrace();
 				this.listen = false;
@@ -134,17 +136,17 @@ public class ChordNode extends Thread {
 
 		}
 	}
-	
+
 	public void parseJoin() {
-		
+
 	}
-	
+
 	public void handleJoin() {
 
 	}
 
 	public void parseLeave() {
-		
+
 	}
 
 	public void handleLeave() {
@@ -152,17 +154,17 @@ public class ChordNode extends Thread {
 	}
 
 	public void parseLookup() {
-		
+
 	}
-	
+
 	public void handleLookup() {
 
 	}
 
 	public void parseUpdate() {
-		
+
 	}
-	
+
 	public void handleUpdate() {
 
 	}

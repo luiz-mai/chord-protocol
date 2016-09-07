@@ -17,7 +17,14 @@ public class Tools {
 	 */
 	public static Inet4Address intToIp(int i) {
 		try {
-			return (Inet4Address) Inet4Address.getByName((new Integer(i)).toString());
+			//if (i < 0){
+				//i = ~i;
+				//i += 1;
+				//i = -i;
+			//}
+			String s = (new Integer(i)).toString();
+			
+			return (Inet4Address) Inet4Address.getByName(s);
 		} catch (UnknownHostException e) {
 			return null;
 		}

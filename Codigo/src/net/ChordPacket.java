@@ -1,6 +1,6 @@
 package net;
 
-public abstract class ChordPacket{
+public abstract class ChordPacket {
 
 	public static final byte JOIN_CODE = 0b0000_0000;
 	public static final byte JOIN_RESP_CODE = (byte) 0b1000_0000;

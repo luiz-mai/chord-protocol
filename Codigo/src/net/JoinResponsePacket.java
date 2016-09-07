@@ -1,70 +1,80 @@
 package net;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.nio.ByteBuffer;
 
-public class JoinResponsePacket extends ChordPacket{
-		
-	private DatagramSocket socket = null;
-	private Inet4Address incomingIp;
-	
+import misc.Tools;
+
+public class JoinResponsePacket extends ChordPacket {
+
+	private byte status; // 0 = falha e 1 = sucesso
 	private int sucessorID;
-	private int sucessorIp;
+	private Inet4Address sucessorIP;
 	private int predecessorID;
-	private int predecessorIp;
-	
-	public JoinResponsePacket (byte[] buffer, int offset){
-		
+	private Inet4Address predecessorIP;
+
+	public static final int packetSize = 18;
+
+	// Construtor para a criação de um pacote JoinResponse recebido
+	public JoinResponsePacket(byte[] buffer, int offset) {
+
+		// Buffer inicializao com 4 pois eh o tamanho maximo dos campos a serem
+		// lidos
+		byte lido[] = new byte[4];
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+
+		// Le um byte do buffer (codigo)
+		bais.read(lido, offset, 1);
+		this.code = lido[0];
+
+		// Le 1 byte do buffer (status)
+		bais.read(lido, offset, 1);
+		this.status = lido[0];
+
+		// Le 4 bytes do buffer (sucessorID)
+		bais.read(lido, offset, 4);
+		this.sucessorID = ByteBuffer.wrap(lido).getInt();
+
+		// Le 4 bytes do buffer (sucessorIP)
+		bais.read(lido, offset, 4);
+		this.sucessorIP = Tools.intToIp(ByteBuffer.wrap(lido).getInt());
+
+		// Le 4 bytes do buffer (predecessorID)
+		bais.read(lido, offset, 4);
+		this.predecessorID = ByteBuffer.wrap(lido).getInt();
+
+		// Le 4 bytes do buffer (sucessorID)
+		bais.read(lido, offset, 4);
+		this.predecessorIP = Tools.intToIp(ByteBuffer.wrap(lido).getInt());
+
 	}
-	
-	public JoinResponsePacket (DatagramSocket socket, Inet4Address incomingIp,
-			int sucessorID, int sucessorIp, int predecessorID, int predecessorIp){
-		
-		this.socket = socket;
-		this.incomingIp = incomingIp;
-		
-		this.code = ChordPacket.JOIN_RESP_CODE;	
+
+	// Construtor para a criação de um pacote JoinResponse a ser enviado
+	public JoinResponsePacket(byte status, int sucessorID, Inet4Address sucessorIP, int predecessorID,
+			Inet4Address predecessorIP) {
+		super();
+		this.code = ChordPacket.JOIN_RESP_CODE;
+		this.status = status;
 		this.sucessorID = sucessorID;
-		this.sucessorIp = sucessorIp;
+		this.sucessorIP = sucessorIP;
 		this.predecessorID = predecessorID;
-		this.predecessorIp = predecessorIp;
-
+		this.predecessorIP = predecessorIP;
 	}
-	
-	void handle(){
-		try {
-			byte[] joinBuffer = ByteBuffer.allocate(18)
-					  .put(this.code)
-					  .put((byte)1)
-					  .putInt(this.sucessorID)
-					  .putInt(this.sucessorIp)
-					  .putInt(this.predecessorID)
-					  .putInt(this.predecessorIp)
-					  .array();
 
-			DatagramPacket joinResponsePacket = new DatagramPacket(joinBuffer, joinBuffer.length, incomingIp, ChordNode.UDP_PORT);
-
-			socket.send(joinResponsePacket);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
 	@Override
-	public byte[] toByteArray(){
-		
+	public byte[] toByteArray() {
+		return ByteBuffer.allocate(18).put(this.code).put(this.status).putInt(this.sucessorID)
+				.putInt(Tools.ipToInt(this.sucessorIP)).putInt(this.predecessorID)
+				.putInt(Tools.ipToInt(this.predecessorIP)).array();
 	}
 
-
-	public String toString(){
-		//TODO toString();
-		return "";
+	public String toString() {
+		return String.format( "code: %x \nstatus: %x\nsucessorID: %d",this.code,this.status,this.sucessorID) +  
+				"\nsucessorIP: " + this.sucessorIP.toString() + 
+				String.format( "\npredecessorID: %d",this.predecessorID) +  
+				"\npredecessorIP:" + this.predecessorIP.toString() + "\n]n";
 	}
-	
+
 }

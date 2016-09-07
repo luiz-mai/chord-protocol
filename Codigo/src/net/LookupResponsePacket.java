@@ -52,9 +52,8 @@ public class LookupResponsePacket extends ChordPacket {
 	}
 	
 	@Override
-	void handle() {
-		// TODO Auto-generated method stub
-
+	public byte[] toByteArray(){
+		return new byte[1];
 	}
 
 }

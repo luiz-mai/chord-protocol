@@ -159,12 +159,12 @@ public class ChordNode extends Thread {
 	public void handleJoin(JoinPacket jp) {
 		if(this.sucessor == null && this.predecessor == null){
 			//Único nó da rede
-			new JoinResponsePacket(socket,
+			/*new JoinResponsePacket(socket,
 								   incomingIp,
 								   this.getID(),
 								   Tools.ipToInt(this.getIp()),
 								   this.getID(),
-								   Tools.ipToInt(this.getIp()));
+								   Tools.ipToInt(this.getIp()));*/
 		} else {
 			//BUSCAR NA REDE
 		}

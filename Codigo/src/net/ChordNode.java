@@ -207,8 +207,8 @@ public class ChordNode extends Thread {
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(), Tools.ipToInt(this.getSucessor().getIp()));
 			byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT );
-			DatagramPacket dp = new 
 			socket.send(dp);
+			
 
 		} else{
 			//O nó atual não é capaz de definir o sucessor, então repassa o Lookup para o próximo nó.

@@ -1,6 +1,7 @@
 package net;
 
 import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
 
 public class LookupPacket extends ChordPacket{
 		
@@ -31,15 +32,39 @@ public class LookupPacket extends ChordPacket{
 		this.wantedID = java.nio.ByteBuffer.wrap(lido).getInt();
 	}
 	
+	public LookupPacket(int originID, int originIp, int wantedID){
+		super();
+		this.code = ChordPacket.LOOKUP_RESP_CODE;
+		this.originID = originID;
+		this.originIp = originIp;
+		this.wantedID = wantedID;
+	}
+	
 	@Override
 	public byte[] toByteArray(){
-		return new byte[1];
+		return ByteBuffer.allocate(13)
+				.put(this.code)
+				.putInt(originID)
+				.putInt(originIp)
+				.putInt(wantedID)
+				.array();
 	}
 
 
-	public String toString(){
-		StringBuilder sb = new StringBuilder().append(String.format("%02x",this.code)).append(String.format("%08x",this.originID)).append(String.format("%08x",this.originIp)).append(String.format("%08x",this.wantedID));
-		return sb.toString();
+	public String toString() {
+		return String.format("code: %b \noriginID: %d\noriginIP: %d\nwnatedID: %d", this.code, this.originID, this.originIp, this.wantedID);
+	}
+
+	public int getOriginID() {
+		return originID;
+	}
+
+	public int getOriginIp() {
+		return originIp;
+	}
+
+	public int getWantedID() {
+		return wantedID;
 	}
 	
 }

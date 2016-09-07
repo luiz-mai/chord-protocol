@@ -42,7 +42,7 @@ public class JoinPacket extends ChordPacket {
 	}
 
 	public String toString() {
-		return String.format("code: %x \nnewNodeID: %x\n\n", this.code, this.newNodeID);
+		return String.format("code: %X \nnewNodeID: %X\n\n", this.code, this.newNodeID);
 	}
 
 }

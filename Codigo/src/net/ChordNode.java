@@ -110,17 +110,12 @@ public class ChordNode extends Thread {
 					case ChordPacket.JOIN_CODE:
 						if(this.sucessor == null && this.predecessor == null){
 							//Único nó da rede
-							byte[] joinBuffer = ByteBuffer.allocate(18)
-														  .put(ChordPacket.JOIN_RESP_CODE)
-														  .put((byte)1)
-														  .putInt(this.getID())
-														  .putInt(ByteBuffer.wrap(InetAddress.getByName(this.getIp().toString()).getAddress()).getInt())
-														  .putInt(this.getID())
-														  .putInt(ByteBuffer.wrap(InetAddress.getByName(this.getIp().toString()).getAddress()).getInt())
-														  .array();
-							
-							DatagramPacket joinPacket = new DatagramPacket(joinBuffer, joinBuffer.length, incomingIp, UDP_PORT);
-							socket.send(joinPacket);
+							new JoinResponsePacket(socket,
+												   incomingIp,
+												   this.getID(),
+												   ByteBuffer.wrap(this.getIp().getAddress()).getInt(),
+												   this.getID(),
+												   ByteBuffer.wrap(this.getIp().getAddress()).getInt());
 						} else {
 							//BUSCAR NA REDE
 						}

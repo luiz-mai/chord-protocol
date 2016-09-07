@@ -210,9 +210,9 @@ public class Main extends Application {
 		     }
 		});
         
-        //mainStage.setScene(scene);
-        //mainStage.centerOnScreen();
-        //mainStage.show();
+        /*mainStage.setScene(scene);
+        mainStage.centerOnScreen();
+        mainStage.show();*/
 	
         byte[] buffer = new byte[]{(byte) 0b1110_1010, 0b0101_1100, (byte) 0b1111_0011, 0b0000_0010, 0b0111_1010};
 		JoinPacket jp = new JoinPacket(buffer,0);

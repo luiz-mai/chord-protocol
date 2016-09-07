@@ -17,12 +17,12 @@ public class JoinPacket extends ChordPacket{
 		this.code = lido[0];
 		
 		// Le 4 bytes do buffer (newNodeID)
-		bais.read(lido,offset,1);
+		bais.read(lido,offset,4);
 		this.newNodeID = java.nio.ByteBuffer.wrap(lido).getInt();
 	}
 	
 	void handle(){
-
+		
 	}
 
 	public String toString(){

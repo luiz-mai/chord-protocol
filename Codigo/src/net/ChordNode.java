@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+
+import sun.net.InetAddressCachePolicy;
+
 
 public class ChordNode extends Thread {
 
@@ -83,9 +88,10 @@ public class ChordNode extends Thread {
 				// tamanho do maior pacote previsto pela aplicação: um envio da
 				// funcionalidade Leave.
 				byte[] buffer = new byte[21];
+				Inet4Address incomingIp = (Inet4Address)Inet4Address.getByName("0.0.0.0");
 
 				// Esperar o recebimento de um pacote
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, incomingIp, UDP_PORT);
 				socket.receive(packet);
 
 				// Parsing do pacote recebido para descobrir qual o seu tipo
@@ -102,6 +108,22 @@ public class ChordNode extends Thread {
 				switch(code){
 					//Join
 					case ChordPacket.JOIN_CODE:
+						if(this.sucessor == null && this.predecessor == null){
+							//Único nó da rede
+							byte[] joinBuffer = ByteBuffer.allocate(18)
+														  .put(ChordPacket.JOIN_RESP_CODE)
+														  .put((byte)1)
+														  .putInt(this.getID())
+														  .putInt(ByteBuffer.wrap(InetAddress.getByName(this.getIp().toString()).getAddress()).getInt())
+														  .putInt(this.getID())
+														  .putInt(ByteBuffer.wrap(InetAddress.getByName(this.getIp().toString()).getAddress()).getInt())
+														  .array();
+							
+							DatagramPacket joinPacket = new DatagramPacket(joinBuffer, joinBuffer.length, incomingIp, UDP_PORT);
+							socket.send(joinPacket);
+						} else {
+							//BUSCAR NA REDE
+						}
 						break;
 					//Join Response
 					case ChordPacket.JOIN_RESP_CODE:

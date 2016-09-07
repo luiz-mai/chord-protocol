@@ -7,6 +7,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
+import misc.Tools;
 import sun.net.InetAddressCachePolicy;
 
 
@@ -113,9 +114,9 @@ public class ChordNode extends Thread {
 							new JoinResponsePacket(socket,
 												   incomingIp,
 												   this.getID(),
-												   ByteBuffer.wrap(this.getIp().getAddress()).getInt(),
+												   Tools.ipToInt(this.getIp()),
 												   this.getID(),
-												   ByteBuffer.wrap(this.getIp().getAddress()).getInt());
+												   Tools.ipToInt(this.getIp()));
 						} else {
 							//BUSCAR NA REDE
 						}

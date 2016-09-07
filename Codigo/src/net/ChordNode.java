@@ -185,11 +185,47 @@ public class ChordNode extends Thread {
 
 	
 	public void handleLookup(LookupPacket lp) {
+		if(this.ID == lp.getWantedID()){
+			//O ID procurado é igual ao ID do nó
+			
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), Tools.ipToInt(this.getIp()));
+			byte[] lrpArray = lrp.toByteArray();
+			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT );
+			socket.send(dp);
+			
+		} else if(this.ID > lp.getWantedID() && this.getPredecessor().getID() < lp.getWantedID()){
+			//O ID procurado fica entre o nó e seu antecessor. Logo, retorna o ID do nó.
+			
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), Tools.ipToInt(this.getIp()));
+			byte[] lrpArray = lrp.toByteArray();
+			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT );
+			socket.send(dp);
+			
+		} else if(this.ID < lp.getWantedID() && this.getSucessor().getID() > lp.getWantedID()){
+			//O ID procurado fica entre o nó e seu sucessor. Logo, retorna o ID do sucessor.
+			
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(), Tools.ipToInt(this.getSucessor().getIp()));
+			byte[] lrpArray = lrp.toByteArray();
+			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT );
+			DatagramPacket dp = new 
+			socket.send(dp);
 
+		} else{
+			//O nó atual não é capaz de definir o sucessor, então repassa o Lookup para o próximo nó.
+			
+			byte[] lpArray = lp.toByteArray();
+			DatagramPacket dp = new DatagramPacket(lpArray, 13, this.getSucessor().getIp(), UDP_PORT );
+			socket.send(dp);
+			
+		}
 	}
 	
 	public void handleLookupResponse(LookupResponsePacket lrp) {
-
+		//Ao receber um LookupResponse, o nó deve atualizar seu sucessor.
+		
+		ChordNode sucessor = this.getSucessor();
+		this.setSucessor(sucessor);
+		
 	}
 	
 	public void handleUpdate(UpdatePacket up) {

@@ -249,14 +249,17 @@ public class ChordNode extends Thread {
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
 					Tools.ipToInt(this.getIp()));
-			byte[] lrpArray = lrp.toByteArray();
+			
+			/*byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
 			try {
 				socket.send(dp);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
+			
+			sendPacket(lrp,Tools.intToIp(lp.getOriginIp()));
 
 		} else if (this.ID > lp.getWantedID() && this.getPredecessor().getID() < lp.getWantedID()) {
 			// O ID procurado fica entre o nó e seu antecessor. Logo, retorna o
@@ -264,7 +267,7 @@ public class ChordNode extends Thread {
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
 					Tools.ipToInt(this.getIp()));
-			byte[] lrpArray = lrp.toByteArray();
+			/*byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
 
 			try {
@@ -272,7 +275,9 @@ public class ChordNode extends Thread {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
+			
+			sendPacket(lrp,Tools.intToIp(lp.getOriginIp()));
 
 		} else if (this.ID < lp.getWantedID() && this.getSucessor().getID() > lp.getWantedID()) {
 			// O ID procurado fica entre o nó e seu sucessor. Logo, retorna o ID
@@ -280,27 +285,31 @@ public class ChordNode extends Thread {
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 					Tools.ipToInt(this.getSucessor().getIp()));
-			byte[] lrpArray = lrp.toByteArray();
+			/*byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
 			try {
 				socket.send(dp);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
+			
+			sendPacket(lrp,Tools.intToIp(lp.getOriginIp()));
 
 		} else {
 			// O nó atual não é capaz de definir o sucessor, então repassa o
 			// Lookup para o próximo nó.
 
-			byte[] lpArray = lp.toByteArray();
+			/*byte[] lpArray = lp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lpArray, 13, this.getSucessor().getIp(), UDP_PORT);
 			try {
 				socket.send(dp);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
+			
+			sendPacket(lp,this.getSucessor().getIp());
 
 		}
 	}

@@ -1,4 +1,4 @@
-#splashScreen, #mainMenu{
+#splashScreen, #mainMenu, #chooseID{
 	-fx-background-image: url("../../resources/images/bg-v.jpg");
 }
 

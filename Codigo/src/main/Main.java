@@ -1,6 +1,8 @@
 package main;
 
 import java.io.FileInputStream;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,6 +19,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
@@ -41,6 +45,8 @@ import net.JoinPacket;
 public class Main extends Application {
 
 
+	private Inet4Address computerIp;
+	
     public static ObservableList<String> receivedMessages = FXCollections.observableArrayList();
     public static ObservableList<String> sentMessages = FXCollections.observableArrayList();
     public static TextField sucessorID = new TextField();
@@ -70,19 +76,49 @@ public class Main extends Application {
         mainStage.centerOnScreen();
         //FIM - SPLASH SCREEN
         
+        //INICIO - ENTRADA DO IP
+		ImageView smallLogo = new ImageView(image);
+		smallLogo.setFitWidth(160);
+		smallLogo.setPreserveRatio(true);
+		smallLogo.setId("menu-logo");
+		
+		TextField ipField = new TextField();
+		ipField.setMaxWidth(220);
+		ipField.setMinHeight(30);
+		ipField.setAlignment(Pos.CENTER);
+		
+		input = new FileInputStream("resources/images/confirm_button.png");
+		image = new Image(input);
+		ImageView confirmButton = new ImageView(image);
+		confirmButton.setId("create-button");
+		
+		VBox ipInput = new VBox(10, ipField, confirmButton);	
+		ipInput.setAlignment(Pos.CENTER);
+        
+        VBox ipBox = new VBox(70, smallLogo, ipInput);		//VBox com o logo e os botões
+        ipBox.setFillWidth(true);
+        ipBox.setAlignment(Pos.CENTER);
+        ipBox.setId("chooseID");
+
+        Scene scene2 = new Scene(ipBox, 338, 600);
+        scene2.getStylesheets().add("css/style.css");
+        
+        //FIM - ENTRADA DO IP
         
         //INICIO - MAIN MENU
         VBox vbox = new VBox(70);		//VBox com o logo e os botões
         vbox.setFillWidth(true);
         vbox.setAlignment(Pos.CENTER);
         vbox.setId("mainMenu");
-        Scene scene2 = new Scene(vbox, 338, 600);
-        scene2.getStylesheets().add("css/style.css");
+        Scene scene3 = new Scene(vbox, 338, 600);
+        scene3.getStylesheets().add("css/style.css");
         
         VBox buttons = new VBox(10);	//VBox com os dois botões
         buttons.setAlignment(Pos.CENTER);
-        
-		ImageView smallLogo = new ImageView(image);
+
+		input = new FileInputStream("resources/images/big-logo.png");
+		image = new Image(input);
+		smallLogo = new ImageView(image);
 		smallLogo.setFitWidth(160);
 		smallLogo.setPreserveRatio(true);
 		smallLogo.setId("menu-logo");
@@ -247,8 +283,8 @@ public class Main extends Application {
 
 		HBox outerBox = new HBox(25, sidebar, mainContent);
 		outerBox.setId("outerbox");
-		Scene scene3 = new Scene(outerBox, 1000, 600);
-        scene3.getStylesheets().add("css/style.css");
+		Scene scene4 = new Scene(outerBox, 1000, 600);
+        scene4.getStylesheets().add("css/style.css");
 		//FIM - TELA PRINCIPAL
         
 		//INICIO - TRANSIÇÃO DA SPLASH SCREEN PARA MAIN MENU
@@ -262,6 +298,25 @@ public class Main extends Application {
        								mainStage.centerOnScreen();
         timeline.play();
 		//FIM - TRANSIÇÃO DA SPLASH SCREEN PARA MAIN MENU
+        
+        confirmButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			//CLICOU NO BOTÃO DE "CONFIRMAR"
+		     @Override
+		     public void handle(MouseEvent event) {
+		    	 try{
+		    		 computerIp = (Inet4Address)Inet4Address.getByName(ipField.getText().toString());
+			         mainStage.setScene(scene3);
+			         mainStage.centerOnScreen();
+		    	 } catch  (Exception UnknownHostException){
+		    		 Alert alert = new Alert(AlertType.INFORMATION);
+		    		 alert.setTitle("IP Inválido");
+		    		 alert.setHeaderText(null);
+		    		 alert.setContentText("Ops, parece que você digitou um IP inválido. Tente novamente.");
+		    		 alert.showAndWait();
+		    	 } 
+		         event.consume();
+		     }
+		});
         
         joinButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			//CLICOU NO BOTÃO DE "ENTRAR NA REDE"
@@ -285,8 +340,10 @@ public class Main extends Application {
 			//CLICOU NO BOTÃO DE "CRIAR REDE"
 		     @Override
 		     public void handle(MouseEvent event) {
-		         mainStage.setScene(scene3);
+		         mainStage.setScene(scene4);
 		         mainStage.centerOnScreen();
+
+		         System.out.println(computerIp);
 		         event.consume();
 		     }
 		});
@@ -314,7 +371,7 @@ public class Main extends Application {
 		     @Override
 		     public void handle(MouseEvent event) {
 	             System.out.println("Deixou a rede.");
-	             mainStage.setScene(scene2);
+	             mainStage.setScene(scene3);
 	             mainStage.centerOnScreen();
 		         event.consume();
 		     }
@@ -328,11 +385,8 @@ public class Main extends Application {
 		input = new FileInputStream("resources/images/icon.png");
 		Image icon = new Image(input);
         mainStage.getIcons().add(icon);
-        
-	
-        byte[] buffer = new byte[]{(byte) 0b1110_1010, 0b0101_1100, (byte) 0b1111_0011, 0b0000_0010, 0b0111_1010};
-		JoinPacket jp = new JoinPacket(buffer,0);
-		System.out.println(jp.toString());
+
+		
 	}
 }
 

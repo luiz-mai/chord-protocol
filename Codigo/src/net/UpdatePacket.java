@@ -69,8 +69,12 @@ public class UpdatePacket extends ChordPacket {
 	}
 
 	public String toString() {
-		return String.format("code: %X \noriginID: %d \nnewSucessorID: %d", this.code, this.originID, this.newSucessorID)
-				+ "\nsucessorIP: " + this.newSucessorIP.toString() + "\n\n";
+		return String.format("[Update]\n"
+				+ "code: %X\n"
+				+ "originID: %d\n"
+				+ "newSucessorID: %d", this.code, this.originID, this.newSucessorID)
+				+ "\nsucessorIP: " + this.newSucessorIP.toString() 
+				+ "\n\n";
 	}
 
 }

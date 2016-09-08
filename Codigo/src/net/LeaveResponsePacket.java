@@ -51,7 +51,10 @@ public class LeaveResponsePacket extends ChordPacket {
 	
 	@Override
 	public String toString(){
-		return String.format("code: %X \noriginID: %d \n\n",this.code,this.originID);
+		return String.format("[LeaveResponse]\n"
+				+ "code: %X \n"
+				+ "originID: %d\n"
+				+ "\n",this.code,this.originID);
 	}
 
 }

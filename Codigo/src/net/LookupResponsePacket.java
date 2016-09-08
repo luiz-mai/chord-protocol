@@ -50,6 +50,16 @@ public class LookupResponsePacket extends ChordPacket {
 				.putInt(sucessorIp)
 				.array();
 	}
+	
+	@Override 
+	public String toString(){
+		return String.format("[LookupResponse]\n"
+				+ "code: %b\n"
+				+ "wantedID: %d\n"
+				+ "sucessorID: %d\n"
+				+ "sucessorIP: %d", this.code, this.wantedID, this.sucessorID, this.sucessorIp)
+				+ "\n\n";
+	}
 
 
 }

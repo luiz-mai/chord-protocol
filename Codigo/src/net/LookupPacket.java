@@ -52,7 +52,12 @@ public class LookupPacket extends ChordPacket{
 
 
 	public String toString() {
-		return String.format("code: %b \noriginID: %d\noriginIP: %d\nwnatedID: %d", this.code, this.originID, this.originIp, this.wantedID);
+		return String.format("[Lookup]\n"
+				+ "code: %b\n"
+				+ "originID: %d\n"
+				+ "originIP: %d\n"
+				+ "wantedID: %d", this.code, this.originID, this.originIp, this.wantedID)
+				+ "\n\n";
 	}
 
 	public int getOriginID() {

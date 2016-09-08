@@ -50,7 +50,10 @@ public class JoinPacket extends ChordPacket {
 
 
 	public String toString() {
-		return String.format("code: %X \nnewNodeID: %X\n\n", this.code, this.newNodeID);
+		return String.format("[Join]\n"
+				+ "code: %X\n"
+				+ "newNodeID: %X\n"
+				+ "\n", this.code, this.newNodeID);
 	}
 
 }

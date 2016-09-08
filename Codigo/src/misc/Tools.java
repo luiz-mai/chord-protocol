@@ -16,15 +16,12 @@ public class Tools {
 	 * represente um IP válido, o valor null será retornado
 	 */
 	public static Inet4Address intToIp(int i) {
+		
 		try {
-			//if (i < 0){
-				//i = ~i;
-				//i += 1;
-				//i = -i;
-			//}
-			String s = (new Integer(i)).toString();
 			
-			return (Inet4Address) Inet4Address.getByName(s);
+			byte[] intEmBytes = ByteBuffer.allocate(4).putInt(i).array();
+			
+			return (Inet4Address) Inet4Address.getByAddress(intEmBytes);
 		} catch (UnknownHostException e) {
 			return null;
 		}

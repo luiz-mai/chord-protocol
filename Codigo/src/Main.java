@@ -173,15 +173,21 @@ public class Main extends Application {
 		predecessorBox.setAlignment(Pos.CENTER);
 		
 		VBox sucPredBox = new VBox(sucessorBox, predecessorBox);
-		
-
 		VBox fieldsBox = new VBox(40, myIdBox, sucPredBox);
+		
+		
 	    input = new FileInputStream("resources/images/leave_button.png");
 		image = new Image(input);
 		ImageView leaveButton = new ImageView(image);
 		
+		input = new FileInputStream("resources/images/lookup_button.png");
+		image = new Image(input);
+		ImageView lookupButton = new ImageView(image);
+		
+		VBox buttonsBox = new VBox(7, lookupButton, leaveButton);
+		
 
-		VBox sidebar = new VBox(80, mainLogo, fieldsBox, leaveButton );
+		VBox sidebar = new VBox(60, mainLogo, fieldsBox, buttonsBox );
 		sidebar.setId("sidebar");
 		sidebar.setMaxWidth(300);
 		sidebar.setPadding(new Insets(30));
@@ -279,6 +285,15 @@ public class Main extends Application {
 		     public void handle(MouseEvent event) {
 		         mainStage.setScene(scene3);
 		         mainStage.centerOnScreen();
+		         event.consume();
+		     }
+		});
+        
+        lookupButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			//CLICOU NO BOTÃO DE "DEIXAR REDE"
+		     @Override
+		     public void handle(MouseEvent event) {
+	             System.out.println("Fez lookup.");
 		         event.consume();
 		     }
 		});

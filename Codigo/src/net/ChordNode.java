@@ -236,11 +236,72 @@ public class ChordNode extends Thread {
 	}
 
 	public void handleLeave(LeavePacket lp) {
-
+		/*
+		 * Recebemos um Leave quando ou o nosso antecessor ou sucessor desejam sair da rede.
+		 * Nesse caso, precisamos checar qual dos dois é que está mandando essa mensagem e
+		 * atualizar o ponteiro correspondentemente.
+		 */
+		
+		// ID do nó que está saindo da rede.
+		int senderID = lp.getExitID();
+		
+		if( senderID == this.getSucessor().getID() ){
+			// É o sucessor quem está saindo da rede.
+			
+			// Precisamos salvar o IP do nó que está saindo da rede para podermos enviar a resposta
+			Inet4Address oldSucessorIP = this.getSucessor().getIp();
+			
+			ChordNode newSucessor = new ChordNode(lp.getExitSucID(),lp.getExitSucIP());
+			this.setSucessor(newSucessor);
+			
+			/* Tendo atualizado o sucessor, precisamos enviar uma mensagem de confirmação
+			 * para o nó que está saindo da rede.
+			 */
+			
+			sendPacket(new LeaveResponsePacket(this.getID()),oldSucessorIP);
+			
+		}else if (senderID == this.getPredecessor().getID()){
+			// É o predecessor quem está saindo da rede.
+			
+			// Precisamos salvar o IP do nó que está saindo da rede para podermos enviar a resposta
+			Inet4Address oldPredecIP = this.getPredecessor().getIp();
+		
+			ChordNode newPredecessor = new ChordNode(lp.getExitPredecID(),lp.getExitPredecIP());
+			this.setPredecessor(newPredecessor);
+			
+			/* Tendo atualizado o sucessor, precisamos enviar uma mensagem de confirmação
+			 * para o nó que está saindo da rede.
+			 */
+			
+			sendPacket(new LeaveResponsePacket(this.getID()),oldPredecIP);
+			
+		}else{
+			// O ID do pacote que enviou a mensagem não corresponde nem ao sucessor nem ao
+			// predecessor. Deve ter sido enviado por engano.
+			
+			// TODO: Ignorar?
+		}
 	}
 
 	public void handleLeaveResponse(LeaveResponsePacket lrp) {
-
+		/* TODO: Esse caso é um pouco mais complexo. Por que receberemos
+		 * pacotes desse tipo quando estivermos saindo da rede. Então precisamos
+		 * enviar um pacote de Leave para os vizinhos e esperar 2 pacotes
+		 * LeaveResponse, um de cada um, para então sabermos que já podemos sair
+		 * efetivamente da rede. Então precisamos setar esse "OK, pode sair" em alguma 
+		 * variável da classe ou algo assim.
+		 */
+		
+		int senderID = lrp.getOriginID();
+		
+		if(senderID == this.getSucessor().getID()){
+			// Sucessor OK
+		}else if (senderID == this.getPredecessor().getID()){
+			// Predecessor OK
+		}else{
+			// Nenhum dos dois. Engano?
+			// Ignorar
+		}
 	}
 
 	public void handleLookup(LookupPacket lp) {

@@ -298,6 +298,10 @@ public class Main extends Application {
         mainStage.centerOnScreen();
         mainStage.show();
         
+
+		input = new FileInputStream("resources/images/icon.png");
+		Image icon = new Image(input);
+        mainStage.getIcons().add(icon);
         
 	
         byte[] buffer = new byte[]{(byte) 0b1110_1010, 0b0101_1100, (byte) 0b1111_0011, 0b0000_0010, 0b0111_1010};

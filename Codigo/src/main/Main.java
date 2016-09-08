@@ -82,17 +82,23 @@ public class Main extends Application {
 		smallLogo.setPreserveRatio(true);
 		smallLogo.setId("menu-logo");
 		
+		Text labelIpField = new Text("DIGITE O SEU IP ABAIXO:");
+		labelIpField.setFill(Color.WHITE);
+		labelIpField.setFont(new Font(16));
 		TextField ipField = new TextField();
 		ipField.setMaxWidth(220);
 		ipField.setMinHeight(30);
 		ipField.setAlignment(Pos.CENTER);
+		
+		VBox ipFieldBox = new VBox(8, labelIpField, ipField);
+		ipFieldBox.setAlignment(Pos.CENTER);
 		
 		input = new FileInputStream("resources/images/confirm_button.png");
 		image = new Image(input);
 		ImageView confirmButton = new ImageView(image);
 		confirmButton.setId("create-button");
 		
-		VBox ipInput = new VBox(10, ipField, confirmButton);	
+		VBox ipInput = new VBox(50, ipFieldBox, confirmButton);	
 		ipInput.setAlignment(Pos.CENTER);
         
         VBox ipBox = new VBox(70, smallLogo, ipInput);		//VBox com o logo e os botões

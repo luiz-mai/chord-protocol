@@ -41,6 +41,12 @@ import net.JoinPacket;
 public class Main extends Application {
 
 
+    public static ObservableList<String> receivedMessages = FXCollections.observableArrayList();
+    public static ObservableList<String> sentMessages = FXCollections.observableArrayList();
+    public static TextField sucessorID = new TextField();
+    public static TextField sucessorIp = new TextField();
+    public static TextField predecessorID = new TextField();
+    public static TextField predecessorIp = new TextField();
 	
 	public static void main(String[] args){
 		Application.launch(args);
@@ -123,7 +129,6 @@ public class Main extends Application {
 		labelSucessorID.setTextAlignment(TextAlignment.CENTER);
 		labelSucessorID.setFill(Color.WHITE);
 		labelSucessorID.setFont(new Font(12));
-		TextField sucessorID = new TextField();
 		sucessorID.setEditable(false);
 		VBox sucessorIDBox = new VBox(sucessorID, labelSucessorID);
 		sucessorIDBox.setAlignment(Pos.CENTER);
@@ -131,7 +136,6 @@ public class Main extends Application {
 		labelSucessorIp.setTextAlignment(TextAlignment.CENTER);
 		labelSucessorIp.setFill(Color.WHITE);
 		labelSucessorIp.setFont(new Font(12));
-		TextField sucessorIp = new TextField();
 		sucessorIp.setEditable(false);
 		VBox sucessorIpBox = new VBox(sucessorIp, labelSucessorIp);
 		sucessorIpBox.setPadding(new Insets(0,0,0,10));
@@ -153,7 +157,6 @@ public class Main extends Application {
 		labelPredecessorID.setTextAlignment(TextAlignment.CENTER);
 		labelPredecessorID.setFill(Color.WHITE);
 		labelPredecessorID.setFont(new Font(12));
-		TextField predecessorID = new TextField();
 		predecessorID.setEditable(false);
 		VBox predecessorIDBox = new VBox(predecessorID, labelPredecessorID);
 		predecessorIDBox.setAlignment(Pos.CENTER);
@@ -161,7 +164,6 @@ public class Main extends Application {
 		labelPredecessorIp.setTextAlignment(TextAlignment.CENTER);
 		labelPredecessorIp.setFill(Color.WHITE);
 		labelPredecessorIp.setFont(new Font(12));
-		TextField predecessorIp = new TextField();
 		predecessorIp.setEditable(false);
 		VBox predecessorIpBox = new VBox(predecessorIp, labelPredecessorIp);
 		predecessorIpBox.setPadding(new Insets(0,0,0,10));
@@ -201,7 +203,6 @@ public class Main extends Application {
 		receivedMessagesLabel.setFont(new Font(20));
 		ScrollPane receivedMessagesScroll = new ScrollPane();
 		ListView<String> receivedMessagesList = new ListView<String>();
-	    ObservableList<String> receivedMessages = FXCollections.observableArrayList();
 	    receivedMessagesList.setItems(receivedMessages);
 	    receivedMessagesList.setMinHeight(525);
 	    receivedMessagesScroll.prefWidthProperty().bind(receivedMessagesList.widthProperty());
@@ -224,7 +225,6 @@ public class Main extends Application {
 		sentMessagesLabel.setFont(new Font(20));
 		ScrollPane sentMessagesScroll = new ScrollPane();
 		ListView<String> sentMessagesList = new ListView<String>();
-	    ObservableList<String> sentMessages = FXCollections.observableArrayList();
 	    sentMessagesList.setItems(sentMessages);
 	    sentMessagesList.setMinHeight(525);
 	    sentMessagesScroll.prefWidthProperty().bind(sentMessagesList.widthProperty());
@@ -295,7 +295,16 @@ public class Main extends Application {
 			//CLICOU NO BOTÃO DE "DEIXAR REDE"
 		     @Override
 		     public void handle(MouseEvent event) {
-	             System.out.println("Fez lookup.");
+		    	 TextInputDialog dialog = new TextInputDialog();
+		    	 dialog.setHeaderText("");
+		         dialog.setTitle("Lookup na rede");
+		         dialog.setContentText("Por favor, digite o ID de um dos membros da rede:");
+		         
+		         
+		         Optional<String> result = dialog.showAndWait();
+		         if (result.isPresent()){
+		             System.out.println("ID digitado: " + result.get());
+		         }
 		         event.consume();
 		     }
 		});

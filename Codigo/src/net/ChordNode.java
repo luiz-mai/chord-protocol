@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.util.Random;
 
 import misc.Tools;
 
@@ -25,13 +26,19 @@ public class ChordNode extends Thread {
 	public boolean listen = true;
 
 	// Construtor para criar o nó local
-	public ChordNode(int id, Inet4Address ip, ChordNode sucessor, ChordNode predecessor) throws IOException {
+	public ChordNode(int id, Inet4Address ip, ChordNode sucessor, ChordNode predecessor) {
 		super();
 		this.ID = id;
 		this.ip = ip;
 		this.sucessor = sucessor;
 		this.predecessor = predecessor;
-		this.socket = new DatagramSocket(UDP_PORT);
+		
+		try{
+			this.socket = new DatagramSocket(UDP_PORT,ip);
+		}catch(IOException e){
+			System.out.println("Erro ao criar o nó. Fechando programa.");
+			System.exit(1);
+		}
 	}
 
 	// Construtor utilizado para criar os objetos sucessor e predecessor
@@ -77,33 +84,33 @@ public class ChordNode extends Thread {
 		this.predecessor = predecessor;
 	}
 
+	public DatagramSocket getSocket() {
+		return socket;
+	}
+	
 	public void run() {
 
 		while (listen) {
-			try {
 
 				// O tamanho do buffer para os pacotes é de 21 bytes pois esse é
 				// tamanho do maior pacote previsto pela aplicação: um envio da
 				// funcionalidade Leave.
 				byte[] buffer = new byte[21];
-				Inet4Address incomingIp = (Inet4Address) Inet4Address.getByName("0.0.0.0");
-
-				// Esperar o recebimento de um pacote
-				DatagramPacket packet = new DatagramPacket(buffer, buffer.length, incomingIp, UDP_PORT);
-				socket.receive(packet);
-
-				// Parsing do pacote recebido para descobrir qual o seu tipo
-
-				// TODO Remover: Imagino que a info do pacote nesse momento
-				// esteja salva no array buffer. Espero que isso seja correto xD
-
-				// Capturar o offset do pacote no buffer pra saber onde começar
-				// a ler
-				int offset = packet.getOffset();
+				
+				DatagramPacket packet = receivePacket(buffer);
+				
+				if( packet == null )
+					continue;
 
 				// Pegando o codigo do pacote (primeiro byte)
+				// TODO: Estou admitindo que o buffer é sempre realocado quando eu chamo packetReceive
+				// e que por isso o pacote começa no começo do buffer.
+				int offset = packet.getOffset();
+				
 				byte code = buffer[offset];
-
+				
+				Inet4Address incomingIp = (Inet4Address) packet.getAddress();
+				
 				switch (code) {
 				// Join
 				case ChordPacket.JOIN_CODE:
@@ -145,12 +152,11 @@ public class ChordNode extends Thread {
 					UpdateResponsePacket urp = new UpdateResponsePacket(buffer, offset);
 					handleUpdateResponse(urp);
 					break;
+				default:
+					// Ignore
 				}
 
-			} catch (IOException e) {
-				e.printStackTrace();
-				this.listen = false;
-			}
+			
 
 		}
 	}
@@ -309,7 +315,7 @@ public class ChordNode extends Thread {
 			// O ID procurado é igual ao ID do nó
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-					Tools.ipToInt(this.getIp()));
+					this.getIp());
 			
 			/*byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
@@ -320,14 +326,14 @@ public class ChordNode extends Thread {
 				e.printStackTrace();
 			}*/
 			
-			sendPacket(lrp,Tools.intToIp(lp.getOriginIp()));
+			sendPacket(lrp,lp.getOriginIp());
 
 		} else if (this.ID > lp.getWantedID() && this.getPredecessor().getID() < lp.getWantedID()) {
 			// O ID procurado fica entre o nó e seu antecessor. Logo, retorna o
 			// ID do nó.
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-					Tools.ipToInt(this.getIp()));
+					this.getIp());
 			/*byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
 
@@ -338,14 +344,14 @@ public class ChordNode extends Thread {
 				e.printStackTrace();
 			}*/
 			
-			sendPacket(lrp,Tools.intToIp(lp.getOriginIp()));
+			sendPacket(lrp,lp.getOriginIp());
 
 		} else if (this.ID < lp.getWantedID() && this.getSucessor().getID() > lp.getWantedID()) {
 			// O ID procurado fica entre o nó e seu sucessor. Logo, retorna o ID
 			// do sucessor.
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
-					Tools.ipToInt(this.getSucessor().getIp()));
+					this.getSucessor().getIp());
 			/*byte[] lrpArray = lrp.toByteArray();
 			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
 			try {
@@ -355,7 +361,7 @@ public class ChordNode extends Thread {
 				e.printStackTrace();
 			}*/
 			
-			sendPacket(lrp,Tools.intToIp(lp.getOriginIp()));
+			sendPacket(lrp,lp.getOriginIp());
 
 		} else {
 			// O nó atual não é capaz de definir o sucessor, então repassa o
@@ -376,10 +382,17 @@ public class ChordNode extends Thread {
 	}
 
 	public void handleLookupResponse(LookupResponsePacket lrp) {
-		// Ao receber um LookupResponse, o nó deve atualizar seu sucessor.
-
-		ChordNode sucessor = this.getSucessor();
-		this.setSucessor(sucessor);
+		
+		if(this.getSucessor() == null || this.getPredecessor() == null){
+			// Nó acabou de ser criado e ainda não tem sucessor e predecessor.
+			// Ao receber um LookupResponse, o nó deve atualizar seu sucessor.
+			
+			ChordNode sucessor = new ChordNode(lrp.getSucessorID(),lrp.getSucessorIp());
+			this.setSucessor(sucessor);
+			
+		}else{
+			System.out.printf("O sucessor do ID procurado tem o ID %d e o seu IP é ",lrp.getSucessorID(),lrp.getSucessorIp().toString());
+		}
 
 	}
 
@@ -405,10 +418,13 @@ public class ChordNode extends Thread {
 		
 	}
 	
-	private void sendPacket(ChordPacket cp, InetAddress destIP){
+	public void sendPacket(ChordPacket cp, InetAddress destIP){
 		
 		byte[] cpArray = cp.toByteArray();
 		DatagramPacket dp = new DatagramPacket(cpArray, cpArray.length, destIP, UDP_PORT);
+		
+		// Adicionar pacote enviado à GUI
+		main.Main.sentMessages.add(cp.toString());
 		
 		try {
 			socket.send(dp);
@@ -417,5 +433,72 @@ public class ChordNode extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
+	public DatagramPacket receivePacket(byte[] buffer){
+		
+		DatagramPacket packet = null;
+		
+		try{
+			
+			Inet4Address incomingIp = (Inet4Address) Inet4Address.getByName("0.0.0.0");
+
+			// Esperar o recebimento de um pacote
+			packet = new DatagramPacket(buffer, buffer.length, incomingIp, UDP_PORT);
+			socket.receive(packet);
+			
+		}catch(IOException e){
+			System.out.println("Erro na hora de receber pacotes. Morri na função ChordNode.receivePacket()");
+			System.exit(1);
+		}
+		
+		return packet;
+	}
+	
+	public static void createRing(Inet4Address ipLocal){
+		
+		// Gerando id aleatoriamente
+		int id = (new Random(1000)).nextInt();
+		
+		ChordNode local = new ChordNode(id,ipLocal,null,null);
+		
+		// Como o nó ainda está sozinho na rede, sucessor e antecessor devem apontar pro próprio objeto
+		local.setSucessor(local);
+		local.setPredecessor(local);
+		
+		local.run();
+	}
+	
+	public static void joinRing(Inet4Address ipLocal, Inet4Address knownHost){
+		
+		// Gerando id aleatoriamente
+		int id = (new Random(1000)).nextInt();
+		
+		ChordNode local = new ChordNode(id,ipLocal,null,null);
+		local.run();
+		
+		// Precisamos fazer um lookup no ID recém criado.
+		
+		//TODO: Eh correto colocar o ID de origem como sendo desse kra que ainda ta fora da rede?
+		LookupPacket lp = new LookupPacket(local.getID(),local.getIp(),local.getID());
+		local.sendPacket(lp, knownHost);
+		
+		byte buffer[] = new byte[21];
+		
+		DatagramPacket packet = local.receivePacket(buffer);
+		
+		int offset = packet.getOffset();
+		
+		byte code = buffer[offset];
+		
+		if(code == ChordPacket.LOOKUP_RESP_CODE){
+			
+		}
+		
+		
+		
+		
+	}
+	
+	
 
 }

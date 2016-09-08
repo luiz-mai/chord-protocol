@@ -1,13 +1,16 @@
 package net;
 
 import java.io.ByteArrayInputStream;
+import java.net.Inet4Address;
 import java.nio.ByteBuffer;
+
+import misc.Tools;
 
 public class LookupResponsePacket extends ChordPacket {
 
 	private int wantedID;
 	private int sucessorID;
-	private int sucessorIp;
+	private Inet4Address sucessorIp;
 	
 	public LookupResponsePacket (byte[] buffer, int offset){
 		
@@ -21,25 +24,36 @@ public class LookupResponsePacket extends ChordPacket {
 		
 		// Le 4 bytes do buffer (wantedID)
 		bais.read(lido,offset,4);
-		this.wantedID = java.nio.ByteBuffer.wrap(lido).getInt();
+		this.wantedID = ByteBuffer.wrap(lido).getInt();
 
 		// Le 4 bytes do buffer (sucessorID)
 		bais.read(lido,offset,4);
-		this.sucessorID = java.nio.ByteBuffer.wrap(lido).getInt();
+		this.sucessorID = ByteBuffer.wrap(lido).getInt();
 
 		// Le 4 bytes do buffer (sucessorIp)
 		bais.read(lido,offset,4);
-		this.sucessorIp = java.nio.ByteBuffer.wrap(lido).getInt();
+		this.sucessorIp = Tools.intToIp(ByteBuffer.wrap(lido).getInt());
 	}
 	
-	public LookupResponsePacket(int wantedID, int sucessorID, int sucessorIp){
+	public LookupResponsePacket(int wantedID, int sucessorID, Inet4Address sucessorIp){
 		super();
 		this.code = ChordPacket.LOOKUP_RESP_CODE;
 		this.wantedID = wantedID;
 		this.sucessorID = sucessorID;
 		this.sucessorIp = sucessorIp;
 	}
-	
+
+	public int getWantedID() {
+		return wantedID;
+	}
+
+	public int getSucessorID() {
+		return sucessorID;
+	}
+
+	public Inet4Address getSucessorIp() {
+		return sucessorIp;
+	}
 
 	@Override
 	public byte[] toByteArray() {
@@ -47,7 +61,7 @@ public class LookupResponsePacket extends ChordPacket {
 				.put(this.code)
 				.putInt(wantedID)
 				.putInt(sucessorID)
-				.putInt(sucessorIp)
+				.putInt(Tools.ipToInt(sucessorIp))
 				.array();
 	}
 	

@@ -8,7 +8,7 @@ public class UpdatePacket extends ChordPacket {
 	
 	@Override
 	public byte[] toByteArray(){
-		
+		return new byte[1];
 	}
 
 

@@ -35,11 +35,19 @@ public class JoinPacket extends ChordPacket {
 
 	@Override
 	public byte[] toByteArray() {
-		return ByteBuffer.allocate(5)
+		
+		int size = JoinPacket.packetSize;
+		
+		return ByteBuffer.allocate(size)
 				.put(this.code)
 				.putInt(newNodeID)
 				.array();
 	}
+
+	public int getNewNodeID() {
+		return newNodeID;
+	}
+
 
 	public String toString() {
 		return String.format("code: %X \nnewNodeID: %X\n\n", this.code, this.newNodeID);

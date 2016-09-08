@@ -62,10 +62,33 @@ public class JoinResponsePacket extends ChordPacket {
 		this.predecessorID = predecessorID;
 		this.predecessorIP = predecessorIP;
 	}
+	
+	public byte getStatus() {
+		return status;
+	}
+
+	public int getSucessorID() {
+		return sucessorID;
+	}
+
+	public Inet4Address getSucessorIP() {
+		return sucessorIP;
+	}
+
+	public int getPredecessorID() {
+		return predecessorID;
+	}
+
+	public Inet4Address getPredecessorIP() {
+		return predecessorIP;
+	}
 
 	@Override
 	public byte[] toByteArray() {
-		return ByteBuffer.allocate(18).put(this.code).put(this.status).putInt(this.sucessorID)
+		
+		int size = JoinResponsePacket.packetSize;
+		
+		return ByteBuffer.allocate(size).put(this.code).put(this.status).putInt(this.sucessorID)
 				.putInt(Tools.ipToInt(this.sucessorIP)).putInt(this.predecessorID)
 				.putInt(Tools.ipToInt(this.predecessorIP)).array();
 	}
@@ -74,7 +97,7 @@ public class JoinResponsePacket extends ChordPacket {
 		return String.format( "code: %x \nstatus: %x\nsucessorID: %d",this.code,this.status,this.sucessorID) +  
 				"\nsucessorIP: " + this.sucessorIP.toString() + 
 				String.format( "\npredecessorID: %d",this.predecessorID) +  
-				"\npredecessorIP:" + this.predecessorIP.toString() + "\n]n";
+				"\npredecessorIP:" + this.predecessorIP.toString() + "\n\n";
 	}
 
 }

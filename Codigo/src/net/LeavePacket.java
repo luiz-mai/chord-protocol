@@ -9,6 +9,6 @@ public class LeavePacket extends ChordPacket {
 	
 	@Override
 	public byte[] toByteArray(){
-		
+		return new byte[1];
 	}
 }

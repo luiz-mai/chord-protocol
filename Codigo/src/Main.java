@@ -18,11 +18,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -100,58 +102,140 @@ public class Main extends Application {
 		mainLogo.setPreserveRatio(true);
 		
 
-		Text labelIds = new Text("MEMBROS DA REDE");
-		labelIds.setTextAlignment(TextAlignment.CENTER);
-		labelIds.setFill(Color.WHITE);
-		labelIds.setFont(new Font(20));
-		ScrollPane idScroll = new ScrollPane();
-		idScroll.setFitToWidth(true);		
-		ListView<String> idList = new ListView<String>();
-	    ObservableList<String> ids = FXCollections.observableArrayList(
-	            "ID 1", "ID 2", "ID 3", "ID 4");
-	    idList.setItems(ids);
-	    idScroll.prefWidthProperty().bind(idList.widthProperty());
-	    idScroll.prefHeightProperty().bind(idList.heightProperty());
-	    idScroll.setContent(idList);
-	    idScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-	    idScroll.setMaxHeight(220);
-	    idScroll.setMinHeight(220);
-
-		VBox idsBox = new VBox(labelIds, idList);
-		idsBox.setAlignment(Pos.CENTER);
+		Text labelMyIp = new Text("MEU IP");
+		labelMyIp.setTextAlignment(TextAlignment.CENTER);
+		labelMyIp.setFill(Color.WHITE);
+		labelMyIp.setFont(new Font(20));
+		TextField myIp = new TextField();
+		myIp.setEditable(false);
+		VBox myIdBox = new VBox(labelMyIp, myIp);
+		myIdBox.setAlignment(Pos.CENTER);
 		
 
+		Text labelSucessor = new Text("SUCESSOR:");
+		labelSucessor.setTextAlignment(TextAlignment.CENTER);
+		labelSucessor.setFill(Color.WHITE);
+		labelSucessor.setFont(new Font(20));
+		labelSucessor.minWidth(300);
+		Text labelSucessorID = new Text("ID");
+		labelSucessorID.setTextAlignment(TextAlignment.CENTER);
+		labelSucessorID.setFill(Color.WHITE);
+		labelSucessorID.setFont(new Font(12));
+		TextField sucessorID = new TextField();
+		sucessorID.setEditable(false);
+		VBox sucessorIDBox = new VBox(sucessorID, labelSucessorID);
+		sucessorIDBox.setAlignment(Pos.CENTER);
+		Text labelSucessorIp = new Text("IP");
+		labelSucessorIp.setTextAlignment(TextAlignment.CENTER);
+		labelSucessorIp.setFill(Color.WHITE);
+		labelSucessorIp.setFont(new Font(12));
+		TextField sucessorIp = new TextField();
+		sucessorIp.setEditable(false);
+		VBox sucessorIpBox = new VBox(sucessorIp, labelSucessorIp);
+		sucessorIpBox.setPadding(new Insets(0,0,0,10));
+		sucessorIpBox.setAlignment(Pos.CENTER);
+		GridPane sucessorGrid = new GridPane();
+		sucessorGrid.add(sucessorIDBox, 0, 0);
+		sucessorGrid.setColumnSpan(sucessorIDBox, 3);
+		sucessorGrid.add(sucessorIpBox, 4, 0);
+		sucessorGrid.setColumnSpan(sucessorIpBox, 1);
+		VBox sucessorBox = new VBox(5, labelSucessor, sucessorGrid);
+		sucessorBox.setAlignment(Pos.CENTER);
+
+		Text labelPredecessor = new Text("PREDECESSOR:");
+		labelPredecessor.setTextAlignment(TextAlignment.CENTER);
+		labelPredecessor.setFill(Color.WHITE);
+		labelPredecessor.setFont(new Font(20));
+		labelPredecessor.minWidth(300);
+		Text labelPredecessorID = new Text("ID");
+		labelPredecessorID.setTextAlignment(TextAlignment.CENTER);
+		labelPredecessorID.setFill(Color.WHITE);
+		labelPredecessorID.setFont(new Font(12));
+		TextField predecessorID = new TextField();
+		predecessorID.setEditable(false);
+		VBox predecessorIDBox = new VBox(predecessorID, labelPredecessorID);
+		predecessorIDBox.setAlignment(Pos.CENTER);
+		Text labelPredecessorIp = new Text("IP");
+		labelPredecessorIp.setTextAlignment(TextAlignment.CENTER);
+		labelPredecessorIp.setFill(Color.WHITE);
+		labelPredecessorIp.setFont(new Font(12));
+		TextField predecessorIp = new TextField();
+		predecessorIp.setEditable(false);
+		VBox predecessorIpBox = new VBox(predecessorIp, labelPredecessorIp);
+		predecessorIpBox.setPadding(new Insets(0,0,0,10));
+		predecessorIpBox.setAlignment(Pos.CENTER);
+		GridPane predecessorGrid = new GridPane();
+		predecessorGrid.add(predecessorIDBox, 0, 0);
+		predecessorGrid.setColumnSpan(predecessorIDBox, 3);
+		predecessorGrid.add(predecessorIpBox, 4, 0);
+		predecessorGrid.setColumnSpan(predecessorIpBox, 1);
+		VBox predecessorBox = new VBox(5, labelPredecessor, predecessorGrid);
+		predecessorBox.setAlignment(Pos.CENTER);
+		
+		VBox sucPredBox = new VBox(sucessorBox, predecessorBox);
+		
+
+		VBox fieldsBox = new VBox(40, myIdBox, sucPredBox);
 	    input = new FileInputStream("resources/images/leave_button.png");
 		image = new Image(input);
 		ImageView leaveButton = new ImageView(image);
 		
 
-		VBox sidebar = new VBox(80, mainLogo, idsBox, leaveButton );
+		VBox sidebar = new VBox(80, mainLogo, fieldsBox, leaveButton );
 		sidebar.setId("sidebar");
 		sidebar.setMaxWidth(300);
 		sidebar.setPadding(new Insets(30));
 		sidebar.setAlignment(Pos.TOP_CENTER);
 		
-		Text messagesLabel = new Text("MENSAGENS:");
-		messagesLabel.setTextAlignment(TextAlignment.CENTER);
-		messagesLabel.setFill(Color.WHITE);
-		messagesLabel.setFont(new Font(20));
-		ScrollPane messagesScroll = new ScrollPane();
-		messagesScroll.setFitToWidth(true);		
-		ListView<String> messagesList = new ListView<String>();
-	    ObservableList<String> messages = FXCollections.observableArrayList(
-	            "Mensagem 1", "Mensagem 2", "Mensagem 3", "Mensagem 4");
-	    messagesList.setItems(messages);
-	    messagesList.setMinHeight(525);
-	    messagesScroll.prefWidthProperty().bind(messagesList.widthProperty());
-	    messagesScroll.prefHeightProperty().bind(messagesList.heightProperty());
-	    messagesScroll.setContent(messagesList);
-	    messagesScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-	    messagesScroll.setMaxHeight(525);
-	    messagesScroll.setMinHeight(525);
-	    messagesScroll.setMinWidth(620);
-		VBox mainContent = new VBox(messagesLabel, messagesScroll);
-		mainContent.setPadding(new Insets(20,15, 20, 10));
+		Text receivedMessagesLabel = new Text("MENSAGENS RECEBIDAS");
+		receivedMessagesLabel.setTextAlignment(TextAlignment.CENTER);
+		receivedMessagesLabel.setFill(Color.WHITE);
+		receivedMessagesLabel.setFont(new Font(20));
+		ScrollPane receivedMessagesScroll = new ScrollPane();
+		ListView<String> receivedMessagesList = new ListView<String>();
+	    ObservableList<String> receivedMessages = FXCollections.observableArrayList();
+	    receivedMessagesList.setItems(receivedMessages);
+	    receivedMessagesList.setMinHeight(525);
+	    receivedMessagesScroll.prefWidthProperty().bind(receivedMessagesList.widthProperty());
+	    receivedMessagesScroll.prefHeightProperty().bind(receivedMessagesList.heightProperty());
+	    receivedMessagesScroll.setContent(receivedMessagesList);
+	    receivedMessagesScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+	    receivedMessagesScroll.setMaxHeight(525);
+	    receivedMessagesScroll.setMinHeight(525);
+		receivedMessagesScroll.maxWidth(400);	
+		receivedMessagesScroll.setMaxWidth(300);
+		receivedMessagesScroll.setMinWidth(300);
+		receivedMessagesScroll.setFitToWidth(true);
+		VBox receivedMessagesBox = new VBox(receivedMessagesLabel, receivedMessagesScroll);
+		receivedMessagesBox.setPadding(new Insets(20,15, 20, 10));
+		receivedMessagesBox.setAlignment(Pos.CENTER);
+		
+		Text sentMessagesLabel = new Text("MENSAGENS ENVIADAS");
+		sentMessagesLabel.setTextAlignment(TextAlignment.CENTER);
+		sentMessagesLabel.setFill(Color.WHITE);
+		sentMessagesLabel.setFont(new Font(20));
+		ScrollPane sentMessagesScroll = new ScrollPane();
+		ListView<String> sentMessagesList = new ListView<String>();
+	    ObservableList<String> sentMessages = FXCollections.observableArrayList();
+	    sentMessagesList.setItems(sentMessages);
+	    sentMessagesList.setMinHeight(525);
+	    sentMessagesScroll.prefWidthProperty().bind(sentMessagesList.widthProperty());
+	    sentMessagesScroll.prefHeightProperty().bind(sentMessagesList.heightProperty());
+	    sentMessagesScroll.setContent(sentMessagesList);
+	    sentMessagesScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+	    sentMessagesScroll.setMaxHeight(525);
+	    sentMessagesScroll.setMinHeight(525);
+		sentMessagesScroll.maxWidth(400);	
+		sentMessagesScroll.setMaxWidth(300);
+		sentMessagesScroll.setMinWidth(300);
+		sentMessagesScroll.setFitToWidth(true);
+		VBox sentMessagesBox = new VBox(sentMessagesLabel, sentMessagesScroll);
+		sentMessagesBox.maxWidth(400);
+		sentMessagesBox.minWidth(400);
+		sentMessagesBox.setPadding(new Insets(20,15, 20, 10));
+		sentMessagesBox.setAlignment(Pos.CENTER);
+		
+		HBox mainContent = new HBox(receivedMessagesBox, sentMessagesBox);
 
 		HBox outerBox = new HBox(25, sidebar, mainContent);
 		outerBox.setId("outerbox");
@@ -210,9 +294,11 @@ public class Main extends Application {
 		     }
 		});
         
-        /*mainStage.setScene(scene);
+        mainStage.setScene(scene);
         mainStage.centerOnScreen();
-        mainStage.show();*/
+        mainStage.show();
+        
+        
 	
         byte[] buffer = new byte[]{(byte) 0b1110_1010, 0b0101_1100, (byte) 0b1111_0011, 0b0000_0010, 0b0111_1010};
 		JoinPacket jp = new JoinPacket(buffer,0);

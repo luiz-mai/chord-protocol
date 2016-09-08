@@ -31,6 +31,11 @@ public class LeaveResponsePacket extends ChordPacket {
 		this.code = ChordPacket.LEAVE_RESP_CODE;
 		this.originID = originID;
 	}
+	
+	
+	public int getOriginID() {
+		return originID;
+	}
 
 
 	@Override

@@ -62,6 +62,31 @@ public class LeavePacket extends ChordPacket {
 		this.exitPredecIP = exitPredecIP;
 	}
 
+	public int getExitID() {
+		return exitID;
+	}
+
+
+	public int getExitSucID() {
+		return exitSucID;
+	}
+
+
+	public Inet4Address getExitSucIP() {
+		return exitSucIP;
+	}
+
+
+	public int getExitPredecID() {
+		return exitPredecID;
+	}
+
+
+	public Inet4Address getExitPredecIP() {
+		return exitPredecIP;
+	}
+
+
 	@Override
 	public byte[] toByteArray(){
 		int size = LeavePacket.packetSize;

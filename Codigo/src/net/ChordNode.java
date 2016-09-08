@@ -314,11 +314,25 @@ public class ChordNode extends Thread {
 	}
 
 	public void handleUpdate(UpdatePacket up) {
-
+		/* Quando recebemos um update, quer dizer que um novo nó entrou
+		 * na rede e ele é o novo sucessor do nó local. Portanto, devemos
+		 * atualizar o ponteiro para o sucessor.
+		 */
+		
+		ChordNode newSucessor = new ChordNode(up.getNewSucessorID(),up.getNewSucessorIP());
+		this.setSucessor(newSucessor);
 	}
 
 	public void handleUpdateResponse(UpdateResponsePacket urp) {
 
+		if(urp.getStatus() == (byte) 0x00){
+			/* TODO: em que situação haveria um erro no Update?
+			 * Reenviar a mensagem em caso de erro?
+			 */
+		}else{
+			// TODO: Acho que nao precisa fazer nada haha.
+		}
+		
 	}
 	
 	private void sendPacket(ChordPacket cp, InetAddress destIP){

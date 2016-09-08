@@ -88,13 +88,18 @@ public class JoinResponsePacket extends ChordPacket {
 		
 		int size = JoinResponsePacket.packetSize;
 		
-		return ByteBuffer.allocate(size).put(this.code).put(this.status).putInt(this.sucessorID)
-				.putInt(Tools.ipToInt(this.sucessorIP)).putInt(this.predecessorID)
-				.putInt(Tools.ipToInt(this.predecessorIP)).array();
+		return ByteBuffer.allocate(size)
+				.put(this.code)
+				.put(this.status)
+				.putInt(this.sucessorID)
+				.putInt(Tools.ipToInt(this.sucessorIP))
+				.putInt(this.predecessorID)
+				.putInt(Tools.ipToInt(this.predecessorIP))
+				.array();
 	}
 
 	public String toString() {
-		return String.format( "code: %x \nstatus: %x\nsucessorID: %d",this.code,this.status,this.sucessorID) +  
+		return String.format( "code: %X \nstatus: %X\nsucessorID: %d",this.code,this.status,this.sucessorID) +  
 				"\nsucessorIP: " + this.sucessorIP.toString() + 
 				String.format( "\npredecessorID: %d",this.predecessorID) +  
 				"\npredecessorIP:" + this.predecessorIP.toString() + "\n\n";

@@ -197,7 +197,42 @@ public class ChordNode extends Thread {
 	}
 
 	public void handleJoinResponse(JoinResponsePacket jrp) {
+		/* A única situação na qual recebemos um JoinResponse é quando queremos entrar
+		 * na rede e enviamos um Join para um nó que já pertença a ela. Esse nó então
+		 * responde a solicitação com um JoinResponse, contendo as informações sobre
+		 * antecessor e sucessor.
+		 */
 		
+		if(jrp.getStatus() == (byte) 0x00){
+			/* TODO: em que situação haveria um erro no Join? O caso de ID repetido não
+			 * é tratado quando fazemos o lookup e recebemos o mesmo ID como sucessor?
+			 * Além disso, o que fazer quando recebermos um erro assim? Reenviar o Join?
+			 */
+		}else{
+			// Join sem erro.
+			
+			/* Só atualizar os ponteiros de sucessor e predecessor se eles já não estiverem
+			 * setados. Temo que fazer isso pq essa JoinResponse pode ter sido enviada por engano
+			 * e caso executemos o procedimento padrão para tratá-la podemos bagunçar a rede
+			 * toda.
+			 */
+			
+			if(this.getSucessor() == null && this.getPredecessor() == null){
+				ChordNode newSucessor = new ChordNode(jrp.getSucessorID(),jrp.getSucessorIP());
+				ChordNode newPredecessor = new ChordNode(jrp.getPredecessorID(),jrp.getPredecessorIP());
+				
+				this.setSucessor(newSucessor);
+				this.setPredecessor(newPredecessor);
+				
+				// Agora precisamos avisar o nosso antecessor que entramos na rede
+				// Para isso mandamos um Update
+				
+				// TODO: Os dois primeiros campos vão ser iguais mesmo?
+				UpdatePacket up = new UpdatePacket(this.getID(),this.getID(),this.getIp());
+				sendPacket(up,this.getPredecessor().getIp());
+			}
+			// E o caso de apenas um deles ser nulo? Precisamos tratar?
+		}
 	}
 
 	public void handleLeave(LeavePacket lp) {
@@ -284,6 +319,19 @@ public class ChordNode extends Thread {
 
 	public void handleUpdateResponse(UpdateResponsePacket urp) {
 
+	}
+	
+	private void sendPacket(ChordPacket cp, InetAddress destIP){
+		
+		byte[] cpArray = cp.toByteArray();
+		DatagramPacket dp = new DatagramPacket(cpArray, cpArray.length, destIP, UDP_PORT);
+		
+		try {
+			socket.send(dp);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -45,7 +45,7 @@ public class JoinResponsePacket extends ChordPacket {
 		bais.read(lido, offset, 4);
 		this.predecessorID = ByteBuffer.wrap(lido).getInt();
 
-		// Le 4 bytes do buffer (sucessorID)
+		// Le 4 bytes do buffer (sucessorIP)
 		bais.read(lido, offset, 4);
 		this.predecessorIP = Tools.intToIp(ByteBuffer.wrap(lido).getInt());
 

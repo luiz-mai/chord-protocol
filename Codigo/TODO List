@@ -1,0 +1,8 @@
+TODO List
+- Dá pra botar pra ele aceitar "Enter" assim como o press do botão na hora de digitar o IP?
+- Quando o botão "Entrar na rede" é clicado e o IP é digitado, a UI não tá mudando para a proxima página
+- Aumentar o tamanho do campo ID na UI, o ID é de 32 bits então ele pode ter 10 dígitos, e diminuir do Suc e Predec.
+- Talvez seja melhor imprimir o ID como hexadecimal, pq o int mostra número negativos (nesse caso o ID terá no máximo 8 dígitos)
+- Quando clicarmos "Sair da rede" ou "Quit", precisamos fechar o socket socket.close() e fechar o programa System.exit(0)
+- Ajeitar a impressão dos códigos dos pacotes para bater com a especificação do trabalho.
+- O programa tá imprimindo varias exceções reclamando que estamos adicionando mensagens à UI de uma thread diferente da thread da UI

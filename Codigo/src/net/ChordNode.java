@@ -5,10 +5,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.Random;
 
 import main.Main;
-import misc.Tools;
 
 public class ChordNode extends Thread {
 
@@ -36,8 +36,14 @@ public class ChordNode extends Thread {
 		
 		try{
 			this.socket = new DatagramSocket(UDP_PORT,ip);
+			
+			/* Setando o timeout para o socket. Ele só ficará bloqueado esperando
+			 * um pacote por no máximo 500ms (0.5s).
+			 */
+			//this.socket.setSoTimeout(500);
 		}catch(IOException e){
 			System.out.println("Erro ao criar o nó. Fechando programa.");
+			e.printStackTrace();
 			System.exit(1);
 		}
 	}
@@ -455,15 +461,18 @@ public class ChordNode extends Thread {
 			packet = new DatagramPacket(buffer, buffer.length, incomingIp, UDP_PORT);
 			socket.receive(packet);
 			
+		}catch(SocketTimeoutException se){
+			System.out.println("Fim do timeout do socket. Parando e reiniciando.");
 		}catch(IOException e){
 			System.out.println("Erro na hora de receber pacotes. Morri na função ChordNode.receivePacket()");
+			e.printStackTrace();
 			System.exit(1);
 		}
 		
 		return packet;
 	}
 	
-	public static void createRing(Inet4Address ipLocal){
+	public static ChordNode createRing(Inet4Address ipLocal){
 		
 		// Gerando id aleatoriamente
 		int id = (new Random()).nextInt();
@@ -479,7 +488,9 @@ public class ChordNode extends Thread {
 		main.Main.predecessorID.setText(Integer.toString(local.getID())); 
 		main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
 		
-		local.run();
+		local.start();
+		
+		return local;
 	}
 	
 	public static void joinRing(Inet4Address ipLocal, Inet4Address knownHost){

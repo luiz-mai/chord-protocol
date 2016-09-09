@@ -4,13 +4,9 @@ import java.io.FileInputStream;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
-import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -21,7 +17,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -29,7 +24,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -41,7 +35,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import net.ChordNode;
-import net.JoinPacket;
+import net.LookupPacket;
 
 public class Main extends Application {
 
@@ -55,6 +49,7 @@ public class Main extends Application {
     public static TextField sucessorIp = new TextField();
     public static TextField predecessorID = new TextField();
     public static TextField predecessorIp = new TextField();
+    public static ChordNode localNode;
 	
 	public static void main(String[] args){
 		Application.launch(args);
@@ -356,8 +351,8 @@ public class Main extends Application {
 		         mainStage.setScene(scene4);
 		         mainStage.centerOnScreen();
 		         
-		         ChordNode.createRing(computerIp);
-
+		         Main.localNode = ChordNode.createRing(computerIp);
+		         
 		         event.consume();
 		     }
 		});
@@ -369,12 +364,23 @@ public class Main extends Application {
 		    	 TextInputDialog dialog = new TextInputDialog();
 		    	 dialog.setHeaderText("");
 		         dialog.setTitle("Lookup na rede");
-		         dialog.setContentText("Por favor, digite o ID de um dos membros da rede:");
+		         dialog.setContentText("Por favor, digite o ID a ser pesquisado:");
 		         
 		         
 		         Optional<String> result = dialog.showAndWait();
 		         if (result.isPresent()){
 		             System.out.println("ID digitado: " + result.get());
+		             int lookupID = Integer.parseInt(result.get());
+		             
+		             LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),lookupID);
+		             
+		             try {
+						Main.localNode.sendPacket(lp,Inet4Address.getByName("192.168.1.3"));
+					} catch (UnknownHostException e) {
+						System.out.println("Morri na hora de enviar o pacote do lookup.");
+						e.printStackTrace();
+					}
+		             
 		         }
 		         event.consume();
 		     }

@@ -9,7 +9,7 @@ import misc.Tools;
 public class LookupPacket extends ChordPacket{
 		
 	private int originID;
-	private Inet4Address originIp;
+	private Inet4Address originIP;
 	private int wantedID;
 	
 	public LookupPacket (byte[] buffer, int offset){
@@ -28,7 +28,7 @@ public class LookupPacket extends ChordPacket{
 
 		// Le 4 bytes do buffer (oroginIp)
 		bais.read(lido,offset,4);
-		this.originIp = Tools.intToIp(ByteBuffer.wrap(lido).getInt());
+		this.originIP = Tools.intToIp(ByteBuffer.wrap(lido).getInt());
 
 		// Le 4 bytes do buffer (newNodeID)
 		bais.read(lido,offset,4);
@@ -37,9 +37,9 @@ public class LookupPacket extends ChordPacket{
 	
 	public LookupPacket(int originID, Inet4Address originIp, int wantedID){
 		super();
-		this.code = ChordPacket.LOOKUP_RESP_CODE;
+		this.code = ChordPacket.LOOKUP_CODE;
 		this.originID = originID;
-		this.originIp = originIp;
+		this.originIP = originIp;
 		this.wantedID = wantedID;
 	}
 	
@@ -48,19 +48,20 @@ public class LookupPacket extends ChordPacket{
 		return ByteBuffer.allocate(13)
 				.put(this.code)
 				.putInt(originID)
-				.putInt(Tools.ipToInt(originIp))
+				.putInt(Tools.ipToInt(originIP))
 				.putInt(wantedID)
 				.array();
 	}
 
 
 	public String toString() {
+		
 		return String.format("[Lookup]\n"
-				+ "code: %b\n"
-				+ "originID: %d\n"
-				+ "originIP: %d\n"
-				+ "wantedID: %d", this.code, this.originID, this.originIp, this.wantedID)
-				+ "\n\n";
+				+ "code: %d\n"
+				+ "originID: %X\n",this.code, this.originID)
+				+ "originIP: " + this.originIP.toString() + "\n"
+				+ String.format("wantedID: 0x%X", this.wantedID)
+				+ "\n";
 	}
 
 	public int getOriginID() {
@@ -68,7 +69,7 @@ public class LookupPacket extends ChordPacket{
 	}
 
 	public Inet4Address getOriginIp() {
-		return originIp;
+		return originIP;
 	}
 
 	public int getWantedID() {

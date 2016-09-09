@@ -23,6 +23,7 @@ public class ChordNode extends Thread {
 
 	// Constante com a porta UDP a ser usada no protocolo
 	public static final int UDP_PORT = 12233;
+	public static final int TIMEOUT = 1000; //ms
 
 	// Variável que define se a thread do servidor deve continuar rodando
 	public boolean listen = true;
@@ -38,14 +39,12 @@ public class ChordNode extends Thread {
 		try{
 			this.socket = new DatagramSocket(UDP_PORT,ip);
 			
-			/* Setando o timeout para o socket. Ele só ficará bloqueado esperando
-			 * um pacote por no máximo 500ms (0.5s).
-			 */
-			//this.socket.setSoTimeout(500);
-		}catch(IOException e){
-			System.out.println("Erro ao criar o nó. Fechando programa.");
-			e.printStackTrace();
-			System.exit(1);
+			// Aqui vamos setar o timeout para o recebimento de pacotes pelo socket
+			// para que ele pare a cada TIMEOUT milisegundos
+			this.getSocket().setSoTimeout(ChordNode.TIMEOUT);
+		}catch(SocketException se){
+				System.out.println("Erro ao setar o timeout para o socket em ChordNode.joinRing()");
+				se.printStackTrace();
 		}
 	}
 
@@ -97,6 +96,16 @@ public class ChordNode extends Thread {
 	}
 	
 	public void run() {
+		
+		try{
+			/* Setando o timeout para o socket. Ele só ficará bloqueado esperando
+			 * um pacote por no máximo 500ms (0.5s).
+			 */
+			this.socket.setSoTimeout(500);
+		}catch(SocketException se){
+			System.out.println("Erro ao setar o timeout para o socket em ChordNode.run()");
+			se.printStackTrace();
+		}
 
 		while (listen) {
 
@@ -105,6 +114,8 @@ public class ChordNode extends Thread {
 				// funcionalidade Leave.
 				byte[] buffer = new byte[21];
 				
+				
+			
 				DatagramPacket packet = receivePacket(buffer);
 				
 				if( packet == null )
@@ -463,9 +474,10 @@ public class ChordNode extends Thread {
 			socket.receive(packet);
 			
 		}catch(SocketTimeoutException se){
-			System.out.println("Fim do timeout do socket. Parando e reiniciando.");
+			System.out.println("ChordNode.receivePacket(): Fim do timeout do socket. Parando e reiniciando.");
+			packet = null;
 		}catch(IOException e){
-			System.out.println("Erro na hora de receber pacotes. Morri na função ChordNode.receivePacket()");
+			System.out.println("ChordNode.receivePacket(): Erro na hora de receber pacotes.");
 			System.exit(1);
 		}
 		
@@ -499,50 +511,140 @@ public class ChordNode extends Thread {
 		int id = (new Random(1000)).nextInt();
 		
 		ChordNode local = new ChordNode(id,ipLocal,null,null);
-		local.run();
 		
-		// Precisamos fazer um lookup no ID recém criado.
+		// Passo 1: Fazer um lookup pelo ID que acabamos de criar
 		
-		//TODO: Eh correto colocar o ID de origem como sendo desse kra que ainda ta fora da rede?
-		LookupPacket lp = new LookupPacket(local.getID(),local.getIp(),local.getID());
-		local.sendPacket(lp, knownHost);
+		LookupResponsePacket lrp = null;
 		
-		byte buffer[] = new byte[21];
-		
-		DatagramPacket packet = local.receivePacket(buffer);
-		
-		int offset = packet.getOffset();
-		byte code = buffer[offset];
-		
-		if(code == ChordPacket.LOOKUP_RESP_CODE){
-			LookupResponsePacket lrp = new LookupResponsePacket(buffer, offset);
-
-			ChordNode sucessor = new ChordNode(lrp.getSucessorID(),lrp.getSucessorIp(),null, null);
-			local.setSucessor(sucessor);
+		while(lrp == null){
+			byte buffer[] = new byte[21];
 			
-
-			main.Main.sucessorID.setText(Integer.toHexString(sucessor.getID()).toUpperCase()); 
-			main.Main.sucessorIp.setText(sucessor.getIp().getHostAddress()); 
+			//TODO: Eh correto colocar o ID de origem como sendo desse kra que ainda ta fora da rede?
+			LookupPacket lp = new LookupPacket(local.getID(),local.getIp(),local.getID());
+			local.sendPacket(lp, knownHost);
 			
-			JoinPacket jp = new JoinPacket(local.getSucessor().getID());
-			local.sendPacket(jp, local.getSucessor().getIp());
+			DatagramPacket packet = local.receivePacket(buffer);
 			
-			DatagramPacket newPacket = local.receivePacket(buffer);
-			offset = packet.getOffset();
-			code = buffer[offset];
+			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+			// Tentar novamente
+			if(packet == null)
+				continue;
+			
+			// Pegar o código do pacote recebido
+			byte code = ChordPacket.getPacketCode(packet);
+			
+			if(code == ChordPacket.LOOKUP_RESP_CODE){
+				
+				lrp = new LookupResponsePacket(buffer,packet.getOffset());
+				
+				if(lrp.getSucessorID() == local.getID()){
+					// O ID gerado é repetido. Vamos gerar um novo.
+					local.setID((new Random(10000)).nextInt());
+					lrp = null;
+					continue;	
+				}
+				
+				// Setaremos o sucessor e antecessor na resposta ao Join
+				
+			}
+			
+		}
+		
+		// Passo 2: Enviar uma mensagem de Join para o nosso sucessor
+		JoinResponsePacket jrp = null;
+		
+		while(jrp == null){
+			
+			byte buffer[] = new byte[21];
+			
+			JoinPacket jp = new JoinPacket(local.getID());
+			
+			Inet4Address sucessorIP = lrp.getSucessorIp();
+			
+			local.sendPacket(jp,sucessorIP);
+			
+			DatagramPacket packet = local.receivePacket(buffer);
+			
+			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+			// Tentar novamente
+			if(packet == null)
+				continue;
+			
+			// Pegar o código do pacote recebido
+			byte code = ChordPacket.getPacketCode(packet);
 			
 			if(code == ChordPacket.JOIN_RESP_CODE){
-				JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
-				ChordNode predecessor = new ChordNode(jrp.getPredecessorID(), jrp.getPredecessorIP());
-				local.setPredecessor(predecessor);
 				
-				UpdatePacket up = new UpdatePacket(local.getID(), local.getID(), local.getIp());
-				local.sendPacket(up, predecessor.getIp());
+				jrp = new JoinResponsePacket(buffer,packet.getOffset());
 				
-				main.Main.predecessorID.setText(Integer.toString(predecessor.getID())); 
-				main.Main.predecessorIp.setText(predecessor.getIp().getHostAddress()); 
+				if(jrp.getStatus() != 0){
+					// Não houve erro no Join
+					
+					// Agora precisamos atualizar o sucessor e antecessor do nó local
+					ChordNode suc = new ChordNode(jrp.getSucessorID(),jrp.getSucessorIP());
+					ChordNode ant = new ChordNode(jrp.getPredecessorID(),jrp.getPredecessorIP());
+					local.setSucessor(suc);
+					local.setPredecessor(ant);
+					
+					// Atualizar as infos de sucessor e antecessor na UI
+					main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
+					main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
+					main.Main.predecessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
+					main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
+					
+				}else{
+					// Houve erro no Join. Vamos tentar novamente.
+					// TODO: Caso o erro não deixe de existir, podemos ficar aqui para sempre
+					jrp = null;
+					continue;
+				}
+				
 			}
+			
 		}
+		
+		// Passo 3: O último passo para entrarmos na rede é mandar um Update para o nosso antecessor
+		
+		UpdateResponsePacket urp = null;
+		
+		while(urp == null){
+			
+			byte buffer[] = new byte[21];
+			
+			UpdatePacket up = new UpdatePacket(local.getID(),local.getID(),local.getIp());
+			
+			Inet4Address predecIP = local.getPredecessor().getIp();
+			
+			local.sendPacket(up,predecIP);
+			
+			DatagramPacket packet = local.receivePacket(buffer);
+			
+			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+			// Tentar novamente
+			if(packet == null)
+				continue;
+			
+			// Pegar o código do pacote recebido
+			byte code = ChordPacket.getPacketCode(packet);
+			
+			if(code == ChordPacket.UPDATE_RESP_CODE){
+				
+				urp = new UpdateResponsePacket(buffer,packet.getOffset());
+				
+				if(urp.getStatus() == 0){
+					// Houve erro no Update. Vamos tentar de novo.
+					// TODO: Caso o erro não deixe de existir, podemos ficar aqui para sempre
+					urp = null;
+					continue;
+				}else{
+					// Estamos devidamente inseridos na rede. Não há mais nada a ser feito.
+				}
+				
+			}
+			
+		}
+		
+		local.start();
 	}
 	
 	

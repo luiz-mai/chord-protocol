@@ -1,5 +1,7 @@
 package net;
 
+import java.net.DatagramPacket;
+
 public abstract class ChordPacket {
 
 	public static final byte JOIN_CODE = 0b0000_0000;
@@ -10,11 +12,20 @@ public abstract class ChordPacket {
 	public static final byte LOOKUP_RESP_CODE = (byte) 0b1000_0010;
 	public static final byte UPDATE_CODE = 0b0000_0011;
 	public static final byte UPDATE_RESP_CODE = (byte) 0b1000_0011;
-	
+
 	protected byte code;
-	
+
 	abstract public byte[] toByteArray();
-	
+
+	// Essa função retorna o primeiro byte do pacote, que é onde o código está
+	// armazenado no protocolo Chord
+	public static byte getPacketCode(DatagramPacket packet) {
+		int offset = packet.getOffset();
+		return packet.getData()[offset];
+		
+		
+	}
+
 	public byte getCode() {
 		return code;
 	}

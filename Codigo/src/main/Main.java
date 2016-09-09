@@ -23,6 +23,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -33,6 +35,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import net.ChordNode;
 import net.LookupPacket;
@@ -86,6 +89,7 @@ public class Main extends Application {
 		ipField.setMaxWidth(220);
 		ipField.setMinHeight(30);
 		ipField.setAlignment(Pos.CENTER);
+		
 		
 		VBox ipFieldBox = new VBox(8, labelIpField, ipField);
 		ipFieldBox.setAlignment(Pos.CENTER);
@@ -183,7 +187,7 @@ public class Main extends Application {
 		sucessorIpBox.setAlignment(Pos.CENTER);
 		GridPane sucessorGrid = new GridPane();
 		sucessorGrid.add(sucessorIDBox, 0, 0);
-		sucessorGrid.setColumnSpan(sucessorIDBox, 3);
+		sucessorGrid.setColumnSpan(sucessorIDBox, 1);
 		sucessorGrid.add(sucessorIpBox, 4, 0);
 		sucessorGrid.setColumnSpan(sucessorIpBox, 1);
 		VBox sucessorBox = new VBox(5, labelSucessor, sucessorGrid);
@@ -213,7 +217,7 @@ public class Main extends Application {
 		predecessorIpBox.setAlignment(Pos.CENTER);
 		GridPane predecessorGrid = new GridPane();
 		predecessorGrid.add(predecessorIDBox, 0, 0);
-		predecessorGrid.setColumnSpan(predecessorIDBox, 3);
+		predecessorGrid.setColumnSpan(predecessorIDBox, 1);
 		predecessorGrid.add(predecessorIpBox, 4, 0);
 		predecessorGrid.setColumnSpan(predecessorIpBox, 1);
 		VBox predecessorBox = new VBox(5, labelPredecessor, predecessorGrid);
@@ -306,6 +310,29 @@ public class Main extends Application {
         timeline.play();
 		//FIM - TRANSIÇÃO DA SPLASH SCREEN PARA MAIN MENU
         
+        ipField.setOnKeyPressed(new EventHandler<KeyEvent>()
+	    {
+	        @Override
+	        public void handle(KeyEvent ke)
+	        {
+	            if (ke.getCode().equals(KeyCode.ENTER))
+	            {
+	            	try{
+			    		 computerIp = (Inet4Address)Inet4Address.getByName(ipField.getText().toString());
+				         myIp.setText(computerIp.getHostAddress());
+			    		 mainStage.setScene(scene3);
+				         mainStage.centerOnScreen();
+			    	 } catch  (Exception UnknownHostException){
+			    		 Alert alert = new Alert(AlertType.INFORMATION);
+			    		 alert.setTitle("IP Inválido");
+			    		 alert.setHeaderText(null);
+			    		 alert.setContentText("Ops, parece que você digitou um IP inválido. Tente novamente.");
+			    		 alert.showAndWait();
+			    	 } 
+	            }
+	        }
+	    });
+        
         confirmButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 			//CLICOU NO BOTÃO DE "CONFIRMAR"
 		     @Override
@@ -338,7 +365,18 @@ public class Main extends Application {
 		         
 		         Optional<String> result = dialog.showAndWait();
 		         if (result.isPresent()){
-		             System.out.println("IP digitado: " + result.get());
+			         
+			         try {
+						ChordNode.joinRing(computerIp, (Inet4Address)Inet4Address.getByName(result.get()));
+			        	 mainStage.setScene(scene4);
+				         mainStage.centerOnScreen();
+					} catch (UnknownHostException e) {
+			    		 Alert alert = new Alert(AlertType.INFORMATION);
+			    		 alert.setTitle("IP Inválido");
+			    		 alert.setHeaderText(null);
+			    		 alert.setContentText("Ops, parece que você digitou um IP inválido. Tente novamente.");
+			    		 alert.showAndWait();
+					}
 		         }
 		         event.consume();
 		     }
@@ -390,9 +428,8 @@ public class Main extends Application {
 			//CLICOU NO BOTÃO DE "DEIXAR REDE"
 		     @Override
 		     public void handle(MouseEvent event) {
-	             System.out.println("Deixou a rede.");
-	             mainStage.setScene(scene3);
-	             mainStage.centerOnScreen();
+	             localNode.closeSocket();
+	             System.exit(0);
 		         event.consume();
 		     }
 		});
@@ -400,6 +437,16 @@ public class Main extends Application {
         mainStage.setScene(scene);
         mainStage.centerOnScreen();
         mainStage.show();
+        mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+            	try{
+            		localNode.closeSocket();
+            		System.exit(0);
+            	} catch (NullPointerException npe ){
+            		System.exit(0);
+            	}
+            }
+        });    
         
         
 

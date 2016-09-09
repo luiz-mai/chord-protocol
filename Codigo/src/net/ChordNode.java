@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 
@@ -465,7 +466,6 @@ public class ChordNode extends Thread {
 			System.out.println("Fim do timeout do socket. Parando e reiniciando.");
 		}catch(IOException e){
 			System.out.println("Erro na hora de receber pacotes. Morri na função ChordNode.receivePacket()");
-			e.printStackTrace();
 			System.exit(1);
 		}
 		
@@ -483,9 +483,9 @@ public class ChordNode extends Thread {
 		local.setSucessor(local);
 		local.setPredecessor(local);
 		
-		main.Main.sucessorID.setText(Integer.toString(local.getID())); 
+		main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
 		main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
-		main.Main.predecessorID.setText(Integer.toString(local.getID())); 
+		main.Main.predecessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
 		main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
 		
 		local.start();
@@ -521,7 +521,7 @@ public class ChordNode extends Thread {
 			local.setSucessor(sucessor);
 			
 
-			main.Main.sucessorID.setText(Integer.toString(sucessor.getID())); 
+			main.Main.sucessorID.setText(Integer.toHexString(sucessor.getID()).toUpperCase()); 
 			main.Main.sucessorIp.setText(sucessor.getIp().getHostAddress()); 
 			
 			JoinPacket jp = new JoinPacket(local.getSucessor().getID());
@@ -552,6 +552,10 @@ public class ChordNode extends Thread {
 	
 	public void showReceivedMessage(ChordPacket packet){
 		Main.receivedMessages.add(packet.toString());
+	}
+	
+	public void closeSocket(){
+		socket.close();
 	}
 	
 

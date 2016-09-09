@@ -40,13 +40,15 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import net.ChordNode;
 import net.JoinPacket;
 
 public class Main extends Application {
 
 
 	private Inet4Address computerIp;
-	
+
+	public static TextField myIp = new TextField();
     public static ObservableList<String> receivedMessages = FXCollections.observableArrayList();
     public static ObservableList<String> sentMessages = FXCollections.observableArrayList();
     public static TextField sucessorID = new TextField();
@@ -156,8 +158,8 @@ public class Main extends Application {
 		labelMyIp.setTextAlignment(TextAlignment.CENTER);
 		labelMyIp.setFill(Color.WHITE);
 		labelMyIp.setFont(new Font(20));
-		TextField myIp = new TextField();
 		myIp.setEditable(false);
+		myIp.setAlignment(Pos.CENTER);
 		VBox myIdBox = new VBox(labelMyIp, myIp);
 		myIdBox.setAlignment(Pos.CENTER);
 		
@@ -172,6 +174,7 @@ public class Main extends Application {
 		labelSucessorID.setFill(Color.WHITE);
 		labelSucessorID.setFont(new Font(12));
 		sucessorID.setEditable(false);
+		sucessorID.setAlignment(Pos.CENTER);
 		VBox sucessorIDBox = new VBox(sucessorID, labelSucessorID);
 		sucessorIDBox.setAlignment(Pos.CENTER);
 		Text labelSucessorIp = new Text("IP");
@@ -179,6 +182,7 @@ public class Main extends Application {
 		labelSucessorIp.setFill(Color.WHITE);
 		labelSucessorIp.setFont(new Font(12));
 		sucessorIp.setEditable(false);
+		sucessorIp.setAlignment(Pos.CENTER);
 		VBox sucessorIpBox = new VBox(sucessorIp, labelSucessorIp);
 		sucessorIpBox.setPadding(new Insets(0,0,0,10));
 		sucessorIpBox.setAlignment(Pos.CENTER);
@@ -200,6 +204,7 @@ public class Main extends Application {
 		labelPredecessorID.setFill(Color.WHITE);
 		labelPredecessorID.setFont(new Font(12));
 		predecessorID.setEditable(false);
+		predecessorID.setAlignment(Pos.CENTER);
 		VBox predecessorIDBox = new VBox(predecessorID, labelPredecessorID);
 		predecessorIDBox.setAlignment(Pos.CENTER);
 		Text labelPredecessorIp = new Text("IP");
@@ -207,6 +212,7 @@ public class Main extends Application {
 		labelPredecessorIp.setFill(Color.WHITE);
 		labelPredecessorIp.setFont(new Font(12));
 		predecessorIp.setEditable(false);
+		predecessorIp.setAlignment(Pos.CENTER);
 		VBox predecessorIpBox = new VBox(predecessorIp, labelPredecessorIp);
 		predecessorIpBox.setPadding(new Insets(0,0,0,10));
 		predecessorIpBox.setAlignment(Pos.CENTER);
@@ -311,7 +317,8 @@ public class Main extends Application {
 		     public void handle(MouseEvent event) {
 		    	 try{
 		    		 computerIp = (Inet4Address)Inet4Address.getByName(ipField.getText().toString());
-			         mainStage.setScene(scene3);
+			         myIp.setText(computerIp.getHostAddress());
+		    		 mainStage.setScene(scene3);
 			         mainStage.centerOnScreen();
 		    	 } catch  (Exception UnknownHostException){
 		    		 Alert alert = new Alert(AlertType.INFORMATION);
@@ -348,8 +355,9 @@ public class Main extends Application {
 		     public void handle(MouseEvent event) {
 		         mainStage.setScene(scene4);
 		         mainStage.centerOnScreen();
+		         
+		         ChordNode.createRing(computerIp);
 
-		         System.out.println(computerIp);
 		         event.consume();
 		     }
 		});
@@ -386,6 +394,7 @@ public class Main extends Application {
         mainStage.setScene(scene);
         mainStage.centerOnScreen();
         mainStage.show();
+        
         
 
 		input = new FileInputStream("resources/images/icon.png");

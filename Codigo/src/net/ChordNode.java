@@ -7,6 +7,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Random;
 
+import main.Main;
 import misc.Tools;
 
 public class ChordNode extends Thread {
@@ -115,41 +116,49 @@ public class ChordNode extends Thread {
 				// Join
 				case ChordPacket.JOIN_CODE:
 					JoinPacket jp = new JoinPacket(buffer, offset);
+					showReceivedMessage(jp);
 					handleJoin(jp, incomingIp);
 					break;
 				// Join Response
 				case ChordPacket.JOIN_RESP_CODE:
 					JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
+					showReceivedMessage(jrp);
 					handleJoinResponse(jrp);
 					break;
 				// Leave
 				case ChordPacket.LEAVE_CODE:
 					LeavePacket lp = new LeavePacket(buffer, offset);
+					showReceivedMessage(lp);
 					handleLeave(lp);
 					break;
 				// LeaveResponse
 				case ChordPacket.LEAVE_RESP_CODE:
 					LeaveResponsePacket lrp = new LeaveResponsePacket(buffer, offset);
+					showReceivedMessage(lrp);
 					handleLeaveResponse(lrp);
 					break;
 				// Lookup
 				case ChordPacket.LOOKUP_CODE:
 					LookupPacket lkp = new LookupPacket(buffer, offset);
+					showReceivedMessage(lkp);
 					handleLookup(lkp);
 					break;
 				// LookupResponse
 				case ChordPacket.LOOKUP_RESP_CODE:
 					LookupResponsePacket lkrp = new LookupResponsePacket(buffer, offset);
+					showReceivedMessage(lkrp);
 					handleLookupResponse(lkrp);
 					break;
 				// Update
 				case ChordPacket.UPDATE_CODE:
 					UpdatePacket up = new UpdatePacket(buffer, offset);
+					showReceivedMessage(up);
 					handleUpdate(up);
 					break;
 				// UpdateResponse
 				case ChordPacket.UPDATE_RESP_CODE:
 					UpdateResponsePacket urp = new UpdateResponsePacket(buffer, offset);
+					showReceivedMessage(urp);
 					handleUpdateResponse(urp);
 					break;
 				default:
@@ -457,13 +466,18 @@ public class ChordNode extends Thread {
 	public static void createRing(Inet4Address ipLocal){
 		
 		// Gerando id aleatoriamente
-		int id = (new Random(1000)).nextInt();
+		int id = (new Random()).nextInt();
 		
 		ChordNode local = new ChordNode(id,ipLocal,null,null);
 		
 		// Como o nó ainda está sozinho na rede, sucessor e antecessor devem apontar pro próprio objeto
 		local.setSucessor(local);
 		local.setPredecessor(local);
+		
+		main.Main.sucessorID.setText(Integer.toString(local.getID())); 
+		main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
+		main.Main.predecessorID.setText(Integer.toString(local.getID())); 
+		main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
 		
 		local.run();
 	}
@@ -487,18 +501,47 @@ public class ChordNode extends Thread {
 		DatagramPacket packet = local.receivePacket(buffer);
 		
 		int offset = packet.getOffset();
-		
 		byte code = buffer[offset];
 		
 		if(code == ChordPacket.LOOKUP_RESP_CODE){
+			LookupResponsePacket lrp = new LookupResponsePacket(buffer, offset);
+
+			ChordNode sucessor = new ChordNode(lrp.getSucessorID(),lrp.getSucessorIp(),null, null);
+			local.setSucessor(sucessor);
 			
+
+			main.Main.sucessorID.setText(Integer.toString(sucessor.getID())); 
+			main.Main.sucessorIp.setText(sucessor.getIp().getHostAddress()); 
+			
+			JoinPacket jp = new JoinPacket(local.getSucessor().getID());
+			local.sendPacket(jp, local.getSucessor().getIp());
+			
+			DatagramPacket newPacket = local.receivePacket(buffer);
+			offset = packet.getOffset();
+			code = buffer[offset];
+			
+			if(code == ChordPacket.JOIN_RESP_CODE){
+				JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
+				ChordNode predecessor = new ChordNode(jrp.getPredecessorID(), jrp.getPredecessorIP());
+				local.setPredecessor(predecessor);
+				
+				UpdatePacket up = new UpdatePacket(local.getID(), local.getID(), local.getIp());
+				local.sendPacket(up, predecessor.getIp());
+				
+				main.Main.predecessorID.setText(Integer.toString(predecessor.getID())); 
+				main.Main.predecessorIp.setText(predecessor.getIp().getHostAddress()); 
+			}
 		}
-		
-		
-		
-		
 	}
 	
+	
+	public void showSentMessage(ChordPacket packet){
+		Main.sentMessages.add(packet.toString());
+	}
+	
+	public void showReceivedMessage(ChordPacket packet){
+		Main.receivedMessages.add(packet.toString());
+	}
 	
 
 }

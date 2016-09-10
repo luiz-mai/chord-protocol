@@ -73,7 +73,7 @@ public class UpdatePacket extends ChordPacket {
 				+ "code: %X\n"
 				+ "originID: %d\n"
 				+ "newSucessorID: %d", this.code, this.originID, this.newSucessorID)
-				+ "\nsucessorIP: " + this.newSucessorIP.toString() 
+				+ "\nsucessorIP: " + this.newSucessorIP.getHostAddress() 
 				+ "\n\n";
 	}
 

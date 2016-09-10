@@ -71,7 +71,7 @@ public class LookupResponsePacket extends ChordPacket {
 				+ "code: %b\n"
 				+ "wantedID: %d\n"
 				+ "sucessorID: %d\n"
-				+ "sucessorIP: %d", this.code, this.wantedID, this.sucessorID, this.sucessorIp)
+				+ "sucessorIP: %d", this.code, this.wantedID, this.sucessorID, this.sucessorIp.getHostAddress())
 				+ "\n\n";
 	}
 

@@ -509,6 +509,8 @@ public class ChordNode extends Thread {
 		
 		// Gerando id aleatoriamente
 		int id = (new Random(1000)).nextInt();
+		int joinAttempts = 0;
+		int updateAttempts = 0;
 		
 		ChordNode local = new ChordNode(id,ipLocal,null,null);
 		
@@ -575,6 +577,8 @@ public class ChordNode extends Thread {
 			
 			if(code == ChordPacket.JOIN_RESP_CODE){
 				
+				joinAttempts++;
+				
 				jrp = new JoinResponsePacket(buffer,packet.getOffset());
 				
 				if(jrp.getStatus() != 0){
@@ -594,7 +598,11 @@ public class ChordNode extends Thread {
 					
 				}else{
 					// Houve erro no Join. Vamos tentar novamente.
-					// TODO: Caso o erro não deixe de existir, podemos ficar aqui para sempre
+					if(joinAttempts >= 10){
+						//Evita que entre em um loop infinito
+						local.closeSocket();
+						System.exit(0);
+					}
 					jrp = null;
 					continue;
 				}
@@ -629,11 +637,17 @@ public class ChordNode extends Thread {
 			
 			if(code == ChordPacket.UPDATE_RESP_CODE){
 				
+				updateAttempts++;
+				
 				urp = new UpdateResponsePacket(buffer,packet.getOffset());
 				
 				if(urp.getStatus() == 0){
 					// Houve erro no Update. Vamos tentar de novo.
-					// TODO: Caso o erro não deixe de existir, podemos ficar aqui para sempre
+					if(updateAttempts >= 10){
+						//Evita que entre em um loop infinito
+						local.closeSocket();
+						System.exit(0);
+					}
 					urp = null;
 					continue;
 				}else{

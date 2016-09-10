@@ -103,9 +103,9 @@ public class JoinResponsePacket extends ChordPacket {
 				+ "code: %X\n"
 				+ "status: %X\n"
 				+ "sucessorID: %d\n",this.code,this.status,this.sucessorID) 
-				+ "sucessorIP: " + this.sucessorIP.toString() 
+				+ "sucessorIP: " + this.sucessorIP.getHostAddress() 
 				+ String.format( "\npredecessorID: %d",this.predecessorID)  
-				+ "\npredecessorIP:" + this.predecessorIP.toString() 
+				+ "\npredecessorIP:" + this.predecessorIP.getHostAddress() 
 				+ "\n\n";
 	}
 

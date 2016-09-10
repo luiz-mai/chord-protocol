@@ -107,9 +107,9 @@ public class LeavePacket extends ChordPacket {
 				+ "code: %X\n"
 				+ "exitID: %d\n"
 				+ "exitSucID: %d\n",this.code,this.exitID,this.exitSucID) 
-				+ "\nexitSucIP: " + this.exitSucIP.toString() 
+				+ "\nexitSucIP: " + this.exitSucIP.getHostAddress() 
 				+ String.format( "\nexitPredecID: %d",this.exitPredecID) 
-				+ "\nexitPredecIP:" + this.exitPredecIP.toString() 
+				+ "\nexitPredecIP:" + this.exitPredecIP.getHostAddress() 
 				+ "\n\n";
 	}
 }

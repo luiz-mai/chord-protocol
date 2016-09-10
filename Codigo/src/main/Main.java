@@ -2,6 +2,7 @@ package main;
 
 import java.io.FileInputStream;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
@@ -26,6 +27,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -37,6 +43,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import misc.Tools;
 import net.ChordNode;
 import net.LookupPacket;
 
@@ -62,9 +69,17 @@ public class Main extends Application {
 	public void start(Stage mainStage) throws Exception {
 		mainStage.setTitle("LCast");
 		
+		FileInputStream input_bg = new FileInputStream("resources/images/bg-v.png");
+		Image bg_v_image = new Image(input_bg);
+		Background bg_v = new Background(new BackgroundImage(bg_v_image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT));
+		input_bg = new FileInputStream("resources/images/bg-h.png");
+		Image bg_h_image = new Image(input_bg);
+		Background bg_h = new Background(new BackgroundImage(bg_h_image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT));
+
 		//INICIO - SPLASH SCREEN
 		StackPane splashScreen = new StackPane();
 		splashScreen.setId("splashScreen");
+		splashScreen.setBackground(bg_v);
 		
 		FileInputStream input = new FileInputStream("resources/images/big-logo.png");
 		Image image = new Image(input);
@@ -106,6 +121,7 @@ public class Main extends Application {
         ipBox.setFillWidth(true);
         ipBox.setAlignment(Pos.CENTER);
         ipBox.setId("chooseID");
+        ipBox.setBackground(bg_v);
 
         Scene scene2 = new Scene(ipBox, 338, 600);
         scene2.getStylesheets().add("css/style.css");
@@ -117,6 +133,7 @@ public class Main extends Application {
         vbox.setFillWidth(true);
         vbox.setAlignment(Pos.CENTER);
         vbox.setId("mainMenu");
+        vbox.setBackground(bg_v);
         Scene scene3 = new Scene(vbox, 338, 600);
         scene3.getStylesheets().add("css/style.css");
         
@@ -294,6 +311,7 @@ public class Main extends Application {
 
 		HBox outerBox = new HBox(25, sidebar, mainContent);
 		outerBox.setId("outerbox");
+		outerBox.setBackground(bg_h);
 		Scene scene4 = new Scene(outerBox, 1000, 600);
         scene4.getStylesheets().add("css/style.css");
 		//FIM - TELA PRINCIPAL
@@ -396,7 +414,7 @@ public class Main extends Application {
 		});
         
         lookupButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-			//CLICOU NO BOTÃO DE "DEIXAR REDE"
+			//CLICOU NO BOTÃO DE "FAZER LOOKUP"
 		     @Override
 		     public void handle(MouseEvent event) {
 		    	 TextInputDialog dialog = new TextInputDialog();
@@ -407,12 +425,10 @@ public class Main extends Application {
 		         
 		         Optional<String> result = dialog.showAndWait();
 		         if (result.isPresent()){
-		             System.out.println("ID digitado: " + result.get());
-		             int lookupID = Integer.parseInt(result.get());
-		             
-		             LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),lookupID);
-		             
+		               
 		             try {
+		            	 int lookupID = Tools.ipToInt(InetAddress.getByName(result.get()));
+		            	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Main.localNode.getID());
 						Main.localNode.sendPacket(lp,Inet4Address.getByName("192.168.1.3"));
 					} catch (UnknownHostException e) {
 						System.out.println("Morri na hora de enviar o pacote do lookup.");

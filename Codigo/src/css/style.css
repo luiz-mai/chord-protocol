@@ -1,11 +1,3 @@
-#splashScreen, #mainMenu, #chooseID{
-	-fx-background-image: url("../../resources/images/bg-v.jpg");
-}
-
-#outerbox{
-	-fx-background-image: url("../../resources/images/bg-h.jpg");
-}
-
 #sidebar{
 	-fx-border-style: solid;  
     -fx-border-width: 0 1 0 0;

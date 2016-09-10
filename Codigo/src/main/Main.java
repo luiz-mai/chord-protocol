@@ -69,11 +69,11 @@ public class Main extends Application {
 	public void start(Stage mainStage) throws Exception {
 		mainStage.setTitle("LCast");
 		
-		FileInputStream input_bg = new FileInputStream("resources/images/bg-v.png");
-		Image bg_v_image = new Image(input_bg);
+		//FileInputStream input_bg = new FileInputStream("resources/images/bg-v.png");
+		Image bg_v_image = new Image(this.getClass().getResourceAsStream("/resources/images/bg-v.png"));
 		Background bg_v = new Background(new BackgroundImage(bg_v_image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT));
-		input_bg = new FileInputStream("resources/images/bg-h.png");
-		Image bg_h_image = new Image(input_bg);
+		//input_bg = new FileInputStream("resources/images/bg-h.png");
+		Image bg_h_image = new Image(this.getClass().getResourceAsStream("/resources/images/bg-h.png"));
 		Background bg_h = new Background(new BackgroundImage(bg_h_image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT));
 
 		//INICIO - SPLASH SCREEN
@@ -81,8 +81,8 @@ public class Main extends Application {
 		splashScreen.setId("splashScreen");
 		splashScreen.setBackground(bg_v);
 		
-		FileInputStream input = new FileInputStream("resources/images/big-logo.png");
-		Image image = new Image(input);
+		//FileInputStream input = new FileInputStream("resources/images/big-logo.png");
+		Image image = new Image(this.getClass().getResourceAsStream("/resources/images/big-logo.png"));
 		ImageView logo = new ImageView(image);
 		splashScreen.getChildren().add(logo);
         Scene scene = new Scene(splashScreen, 338, 600);
@@ -109,8 +109,8 @@ public class Main extends Application {
 		VBox ipFieldBox = new VBox(8, labelIpField, ipField);
 		ipFieldBox.setAlignment(Pos.CENTER);
 		
-		input = new FileInputStream("resources/images/confirm_button.png");
-		image = new Image(input);
+		//input = new FileInputStream("resources/images/confirm_button.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/confirm_button.png"));
 		ImageView confirmButton = new ImageView(image);
 		confirmButton.setId("create-button");
 		
@@ -140,22 +140,22 @@ public class Main extends Application {
         VBox buttons = new VBox(10);	//VBox com os dois botões
         buttons.setAlignment(Pos.CENTER);
 
-		input = new FileInputStream("resources/images/big-logo.png");
-		image = new Image(input);
+		//input = new FileInputStream("resources/images/big-logo.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/big-logo.png"));
 		smallLogo = new ImageView(image);
 		smallLogo.setFitWidth(160);
 		smallLogo.setPreserveRatio(true);
 		smallLogo.setId("menu-logo");
 		vbox.getChildren().add(smallLogo);
 		
-		input = new FileInputStream("resources/images/create_button.png");
-		image = new Image(input);
+		//input = new FileInputStream("resources/images/create_button.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/create_button.png"));
 		ImageView createButton = new ImageView(image);
 		createButton.setId("create-button");
 		buttons.getChildren().add(createButton);
 
-		input = new FileInputStream("resources/images/join_button.png");
-		image = new Image(input);
+		//input = new FileInputStream("resources/images/join_button.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/join_button.png"));
 		ImageView joinButton = new ImageView(image);
 		joinButton.setId("join-button");
 		buttons.getChildren().add(joinButton);
@@ -163,8 +163,8 @@ public class Main extends Application {
 		//FIM - MAIN MENU
 		
 		//INICIO - TELA PRINCIPAL
-		input = new FileInputStream("resources/images/big-logo.png");
-		image = new Image(input);
+		//input = new FileInputStream("resources/images/big-logo.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/big-logo.png"));
 		ImageView mainLogo = new ImageView(image);
 		mainLogo.setFitWidth(200);
 		mainLogo.setPreserveRatio(true);
@@ -244,12 +244,12 @@ public class Main extends Application {
 		VBox fieldsBox = new VBox(40, myIdBox, sucPredBox);
 		
 		
-	    input = new FileInputStream("resources/images/leave_button.png");
-		image = new Image(input);
+	    //input = new FileInputStream("resources/images/leave_button.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/leave_button.png"));
 		ImageView leaveButton = new ImageView(image);
 		
-		input = new FileInputStream("resources/images/lookup_button.png");
-		image = new Image(input);
+		//input = new FileInputStream("resources/images/lookup_button.png");
+		image = new Image(this.getClass().getResourceAsStream("/resources/images/lookup_button.png"));
 		ImageView lookupButton = new ImageView(image);
 		
 		VBox buttonsBox = new VBox(7, lookupButton, leaveButton);
@@ -427,7 +427,6 @@ public class Main extends Application {
 		         if (result.isPresent()){
 		               
 		             try {
-		            	 int lookupID = Tools.ipToInt(InetAddress.getByName(result.get()));
 		            	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Main.localNode.getID());
 						Main.localNode.sendPacket(lp,Inet4Address.getByName("192.168.1.3"));
 					} catch (UnknownHostException e) {
@@ -466,8 +465,8 @@ public class Main extends Application {
         
         
 
-		input = new FileInputStream("resources/images/icon.png");
-		Image icon = new Image(input);
+		//input = new FileInputStream("resources/images/icon.png");
+		Image icon = new Image(this.getClass().getResourceAsStream("/resources/images/icon.png"));
         mainStage.getIcons().add(icon);
 
 		

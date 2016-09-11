@@ -134,49 +134,49 @@ public class ChordNode extends Thread {
 				// Join
 				case ChordPacket.JOIN_CODE:
 					JoinPacket jp = new JoinPacket(buffer, offset);
-					showReceivedMessage(jp);
+					Main.showReceivedMessage(jp);
 					handleJoin(jp, incomingIp);
 					break;
 				// Join Response
 				case ChordPacket.JOIN_RESP_CODE:
 					JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
-					showReceivedMessage(jrp);
+					Main.showReceivedMessage(jrp);
 					handleJoinResponse(jrp);
 					break;
 				// Leave
 				case ChordPacket.LEAVE_CODE:
 					LeavePacket lp = new LeavePacket(buffer, offset);
-					showReceivedMessage(lp);
+					Main.showReceivedMessage(lp);
 					handleLeave(lp);
 					break;
 				// LeaveResponse
 				case ChordPacket.LEAVE_RESP_CODE:
 					LeaveResponsePacket lrp = new LeaveResponsePacket(buffer, offset);
-					showReceivedMessage(lrp);
+					Main.showReceivedMessage(lrp);
 					handleLeaveResponse(lrp);
 					break;
 				// Lookup
 				case ChordPacket.LOOKUP_CODE:
 					LookupPacket lkp = new LookupPacket(buffer, offset);
-					showReceivedMessage(lkp);
+					Main.showReceivedMessage(lkp);
 					handleLookup(lkp);
 					break;
 				// LookupResponse
 				case ChordPacket.LOOKUP_RESP_CODE:
 					LookupResponsePacket lkrp = new LookupResponsePacket(buffer, offset);
-					showReceivedMessage(lkrp);
+					Main.showReceivedMessage(lkrp);
 					handleLookupResponse(lkrp);
 					break;
 				// Update
 				case ChordPacket.UPDATE_CODE:
 					UpdatePacket up = new UpdatePacket(buffer, offset);
-					showReceivedMessage(up);
-					handleUpdate(up);
+					Main.showReceivedMessage(up);
+					handleUpdate(up,incomingIp);
 					break;
 				// UpdateResponse
 				case ChordPacket.UPDATE_RESP_CODE:
 					UpdateResponsePacket urp = new UpdateResponsePacket(buffer, offset);
-					showReceivedMessage(urp);
+					Main.showReceivedMessage(urp);
 					handleUpdateResponse(urp);
 					break;
 				default:
@@ -206,6 +206,7 @@ public class ChordNode extends Thread {
 			// Vamos atualizar o predecessor do nó local
 			ChordNode newNode = new ChordNode(jp.getNewNodeID(),incomingIp);
 			this.setPredecessor(newNode);
+			Main.setPredecessorUI(newNode);
 		}
 		
 		/*
@@ -352,7 +353,7 @@ public class ChordNode extends Thread {
 			// antecessor são iguais. Podemos comparar o objetos diretamente pois nesse caso o objeto
 			// apontado é o mesmo, visto a forma como o nó é criado na função createRing()
 			
-			System.out.println("Cai no caso do kra sozinho!");
+			//TODO: /*deletar*/ System.out.println("Cai no caso do kra sozinho!");
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
 					this.getIp());
 			
@@ -421,13 +422,16 @@ public class ChordNode extends Thread {
 			ChordNode sucessor = new ChordNode(lrp.getSucessorID(),lrp.getSucessorIp());
 			this.setSucessor(sucessor);
 			
+			//TODO: Esse eh o local correto de colocar isso mesmo?
+			Main.setSucessorUI(sucessor);
+			
 		}else{
 			System.out.printf("O sucessor do ID procurado tem o ID %d e o seu IP é ",lrp.getSucessorID(),lrp.getSucessorIp().toString());
 		}
 
 	}
 
-	public void handleUpdate(UpdatePacket up) {
+	public void handleUpdate(UpdatePacket up, Inet4Address incomingIP) {
 		/* Quando recebemos um update, quer dizer que um novo nó entrou
 		 * na rede e ele é o novo sucessor do nó local. Portanto, devemos
 		 * atualizar o ponteiro para o sucessor.
@@ -436,6 +440,9 @@ public class ChordNode extends Thread {
 		ChordNode newSucessor = new ChordNode(up.getNewSucessorID(),up.getNewSucessorIP());
 		this.setSucessor(newSucessor);
 		Main.setSucessorUI(newSucessor);
+		
+		UpdateResponsePacket urp = new UpdateResponsePacket((byte) 1,this.getID());
+		sendPacket(urp,incomingIP);
 	}
 
 	public void handleUpdateResponse(UpdateResponsePacket urp) {
@@ -500,8 +507,10 @@ public class ChordNode extends Thread {
 		local.setSucessor(local);
 		local.setPredecessor(local);
 		
+		// Atualizar infos na UI
 		Main.setSucessorUI(local);
 		Main.setPredecessorUI(local);
+		Main.setMyselfUI(local);
 
 		/*main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
 		main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
@@ -546,6 +555,7 @@ public class ChordNode extends Thread {
 			if(code == ChordPacket.LOOKUP_RESP_CODE){
 				
 				lrp = new LookupResponsePacket(buffer,packet.getOffset());
+				Main.showReceivedMessage(lrp);
 				
 				if(lrp.getSucessorID() == local.getID()){
 					// O ID gerado é repetido. Vamos gerar um novo.
@@ -559,6 +569,9 @@ public class ChordNode extends Thread {
 			}
 			
 		}
+		
+		// Atualizar info do no local na UI
+		Main.setMyselfUI(local);
 		
 		// Passo 2: Enviar uma mensagem de Join para o nosso sucessor
 		JoinResponsePacket jrp = null;
@@ -588,6 +601,7 @@ public class ChordNode extends Thread {
 				joinAttempts++;
 				
 				jrp = new JoinResponsePacket(buffer,packet.getOffset());
+				Main.showReceivedMessage(jrp);
 				
 				if(jrp.getStatus() != 0){
 					// Não houve erro no Join
@@ -599,10 +613,8 @@ public class ChordNode extends Thread {
 					local.setPredecessor(ant);
 					
 					// Atualizar as infos de sucessor e antecessor na UI
-					main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
-					main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
-					main.Main.predecessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
-					main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
+					Main.setSucessorUI(suc);
+					Main.setPredecessorUI(ant);
 					
 				}else{
 					// Houve erro no Join. Vamos tentar novamente.
@@ -648,6 +660,7 @@ public class ChordNode extends Thread {
 				updateAttempts++;
 				
 				urp = new UpdateResponsePacket(buffer,packet.getOffset());
+				Main.showReceivedMessage(urp);
 				
 				if(urp.getStatus() == 0){
 					// Houve erro no Update. Vamos tentar de novo.
@@ -667,15 +680,6 @@ public class ChordNode extends Thread {
 		}
 		
 		local.start();
-	}
-	
-	
-	public void showSentMessage(ChordPacket packet){
-		Main.sentMessages.add(packet.toString());
-	}
-	
-	public void showReceivedMessage(ChordPacket packet){
-		Main.receivedMessages.add(packet.toString());
 	}
 	
 	public void closeSocket(){

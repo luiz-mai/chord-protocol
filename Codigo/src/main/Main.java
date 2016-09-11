@@ -3,6 +3,7 @@ package main;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Optional;
+import java.lang.Number;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -42,6 +43,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import net.ChordNode;
+import net.ChordPacket;
 import net.LookupPacket;
 
 public class Main extends Application {
@@ -500,6 +502,22 @@ public class Main extends Application {
 	public static void setPredecessorUI(ChordNode cn){
 		main.Main.predecessorID.setText(Integer.toHexString(cn.getID()).toUpperCase()); 
 		main.Main.predecessorIp.setText(cn.getIp().getHostAddress());
+	}
+	
+	public static void setMyselfUI(ChordNode cn){
+		main.Main.myID.setText(Integer.toHexString(cn.getID()).toUpperCase()); 
+		main.Main.myIp.setText(cn.getIp().getHostAddress());
+	}
+	
+	public static void showSentMessage(ChordPacket packet){
+		Main.sentMessages.add(packet.toString());
+	}
+	
+	public static void showReceivedMessage(ChordPacket packet){
+		/*String s = (new Long(System.currentTimeMillis())).toString() + "\n" 
+				+ packet.toString();
+		*/
+		Main.receivedMessages.add(packet.toString());
 	}
 }
 

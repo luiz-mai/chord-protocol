@@ -471,5 +471,15 @@ public class Main extends Application {
 
 		
 	}
+	
+	public static void setSucessorUI(ChordNode cn){
+		main.Main.sucessorID.setText(Integer.toHexString(cn.getID()).toUpperCase()); 
+		main.Main.sucessorIp.setText(cn.getIp().getHostAddress()); 
+	}
+	
+	public static void setPredecessorUI(ChordNode cn){
+		main.Main.predecessorID.setText(Integer.toHexString(cn.getID()).toUpperCase()); 
+		main.Main.predecessorIp.setText(cn.getIp().getHostAddress());
+	}
 }
 

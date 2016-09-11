@@ -348,7 +348,19 @@ public class ChordNode extends Thread {
 			
 			sendPacket(lrp,lp.getOriginIp());
 
-		} else if(this.getSucessor() == this.getPredecessor()){
+		} else if (this.ID != this.getSucessor().getID() && this.getSucessor() == this.getPredecessor()){
+			//Aqui, a rede tem dois nós.
+			LookupResponsePacket lrp;
+			if(lp.getWantedID() > this.ID && lp.getWantedID() < this.getSucessor().getId()){
+				lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+						this.getSucessor().getIp());
+			} else {
+				lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+						this.getIp());
+			}
+			sendPacket(lrp,lp.getOriginIp());
+		}
+			else if(this.ID == this.getSucessor().getID() && this.getSucessor() == this.getPredecessor()){
 			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros para o sucessor e 
 			// antecessor são iguais. Podemos comparar o objetos diretamente pois nesse caso o objeto
 			// apontado é o mesmo, visto a forma como o nó é criado na função createRing()
@@ -672,14 +684,15 @@ public class ChordNode extends Thread {
 					urp = null;
 					continue;
 				}else{
-					// Estamos devidamente inseridos na rede. Não há mais nada a ser feito.
+					//Ocorreu tudo bem.
+					Main.localNode = local;
+					local.start();
 				}
 				
 			}
 			
 		}
-		
-		local.start();
+
 	}
 	
 	public void closeSocket(){

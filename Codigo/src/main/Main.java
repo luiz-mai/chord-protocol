@@ -1,8 +1,6 @@
 package main;
 
-import java.io.FileInputStream;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
@@ -43,7 +41,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import misc.Tools;
 import net.ChordNode;
 import net.LookupPacket;
 
@@ -52,6 +49,7 @@ public class Main extends Application {
 
 	private Inet4Address computerIp;
 
+	public static TextField myID = new TextField();
 	public static TextField myIp = new TextField();
     public static ObservableList<String> receivedMessages = FXCollections.observableArrayList();
     public static ObservableList<String> sentMessages = FXCollections.observableArrayList();
@@ -170,14 +168,36 @@ public class Main extends Application {
 		mainLogo.setPreserveRatio(true);
 		
 
+		Text labelMe = new Text("MINHAS INFORMAÇÕES");
+		labelMe.setTextAlignment(TextAlignment.CENTER);
+		labelMe.setFill(Color.WHITE);
+		labelMe.setFont(new Font(20));
+		labelMe.minWidth(300);
+		Text labelMyID = new Text("MEU ID");
+		labelMyID.setTextAlignment(TextAlignment.CENTER);
+		labelMyID.setFill(Color.WHITE);
+		labelMyID.setFont(new Font(12));
+		myID.setEditable(false);
+		myID.setAlignment(Pos.CENTER);
+		VBox myIDBox = new VBox(myID, labelMyID);
+		myIDBox.setAlignment(Pos.CENTER);
 		Text labelMyIp = new Text("MEU IP");
 		labelMyIp.setTextAlignment(TextAlignment.CENTER);
 		labelMyIp.setFill(Color.WHITE);
-		labelMyIp.setFont(new Font(20));
+		labelMyIp.setFont(new Font(12));
 		myIp.setEditable(false);
 		myIp.setAlignment(Pos.CENTER);
-		VBox myIdBox = new VBox(labelMyIp, myIp);
-		myIdBox.setAlignment(Pos.CENTER);
+		VBox myIpBox = new VBox(myIp, labelMyIp);
+		myIpBox.setPadding(new Insets(0,0,0,10));
+		myIpBox.setAlignment(Pos.CENTER);
+		GridPane myInfoGrid = new GridPane();
+		myInfoGrid.add(myIDBox, 0, 0);
+		GridPane.setColumnSpan(myIDBox, 1);
+		myInfoGrid.add(myIpBox, 4, 0);
+		GridPane.setColumnSpan(myIpBox, 1);
+		VBox myInfoBox = new VBox(5, labelMe, myInfoGrid);
+		myInfoBox.setAlignment(Pos.CENTER);
+	
 		
 
 		Text labelSucessor = new Text("SUCESSOR:");
@@ -204,9 +224,9 @@ public class Main extends Application {
 		sucessorIpBox.setAlignment(Pos.CENTER);
 		GridPane sucessorGrid = new GridPane();
 		sucessorGrid.add(sucessorIDBox, 0, 0);
-		sucessorGrid.setColumnSpan(sucessorIDBox, 1);
+		GridPane.setColumnSpan(sucessorIDBox, 1);
 		sucessorGrid.add(sucessorIpBox, 4, 0);
-		sucessorGrid.setColumnSpan(sucessorIpBox, 1);
+		GridPane.setColumnSpan(sucessorIpBox, 1);
 		VBox sucessorBox = new VBox(5, labelSucessor, sucessorGrid);
 		sucessorBox.setAlignment(Pos.CENTER);
 
@@ -234,14 +254,14 @@ public class Main extends Application {
 		predecessorIpBox.setAlignment(Pos.CENTER);
 		GridPane predecessorGrid = new GridPane();
 		predecessorGrid.add(predecessorIDBox, 0, 0);
-		predecessorGrid.setColumnSpan(predecessorIDBox, 1);
+		GridPane.setColumnSpan(predecessorIDBox, 1);
 		predecessorGrid.add(predecessorIpBox, 4, 0);
-		predecessorGrid.setColumnSpan(predecessorIpBox, 1);
+		GridPane.setColumnSpan(predecessorIpBox, 1);
 		VBox predecessorBox = new VBox(5, labelPredecessor, predecessorGrid);
 		predecessorBox.setAlignment(Pos.CENTER);
 		
 		VBox sucPredBox = new VBox(sucessorBox, predecessorBox);
-		VBox fieldsBox = new VBox(40, myIdBox, sucPredBox);
+		VBox fieldsBox = new VBox(40, myInfoBox, sucPredBox);
 		
 		
 	    //input = new FileInputStream("resources/images/leave_button.png");

@@ -1,8 +1,6 @@
 package main;
 
-import java.io.FileInputStream;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
@@ -43,7 +41,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import misc.Tools;
 import net.ChordNode;
 import net.LookupPacket;
 
@@ -204,9 +201,9 @@ public class Main extends Application {
 		sucessorIpBox.setAlignment(Pos.CENTER);
 		GridPane sucessorGrid = new GridPane();
 		sucessorGrid.add(sucessorIDBox, 0, 0);
-		sucessorGrid.setColumnSpan(sucessorIDBox, 1);
+		GridPane.setColumnSpan(sucessorIDBox, 1);
 		sucessorGrid.add(sucessorIpBox, 4, 0);
-		sucessorGrid.setColumnSpan(sucessorIpBox, 1);
+		GridPane.setColumnSpan(sucessorIpBox, 1);
 		VBox sucessorBox = new VBox(5, labelSucessor, sucessorGrid);
 		sucessorBox.setAlignment(Pos.CENTER);
 
@@ -234,9 +231,9 @@ public class Main extends Application {
 		predecessorIpBox.setAlignment(Pos.CENTER);
 		GridPane predecessorGrid = new GridPane();
 		predecessorGrid.add(predecessorIDBox, 0, 0);
-		predecessorGrid.setColumnSpan(predecessorIDBox, 1);
+		GridPane.setColumnSpan(predecessorIDBox, 1);
 		predecessorGrid.add(predecessorIpBox, 4, 0);
-		predecessorGrid.setColumnSpan(predecessorIpBox, 1);
+		GridPane.setColumnSpan(predecessorIpBox, 1);
 		VBox predecessorBox = new VBox(5, labelPredecessor, predecessorGrid);
 		predecessorBox.setAlignment(Pos.CENTER);
 		

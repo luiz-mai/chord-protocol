@@ -55,10 +55,9 @@ public class LookupPacket extends ChordPacket{
 
 
 	public String toString() {
-		
-		return String.format("[Lookup]\n"
+		return String.format("[Lookup - %s]\n"
 				+ "code: %Xh\n"
-				+ "originID: %Xh\n",this.code, this.originID)
+				+ "originID: %Xh\n",getCurrentTime(), this.code, this.originID)
 				+ "originIP: " + this.originIP.getHostAddress() + "\n"
 				+ String.format("wantedID: %Xh", this.wantedID)
 				+ "\n";

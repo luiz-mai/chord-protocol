@@ -1,6 +1,8 @@
 package net;
 
 import java.net.DatagramPacket;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public abstract class ChordPacket {
 
@@ -28,5 +30,11 @@ public abstract class ChordPacket {
 
 	public byte getCode() {
 		return code;
+	}
+	
+	public static String getCurrentTime(){
+		Calendar cal = Calendar.getInstance();
+	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+	    return sdf.format(cal.getTime());
 	}
 }

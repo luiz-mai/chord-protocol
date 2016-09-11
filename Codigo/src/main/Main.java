@@ -263,7 +263,7 @@ public class Main extends Application {
 		predecessorBox.setAlignment(Pos.CENTER);
 		
 		VBox sucPredBox = new VBox(sucessorBox, predecessorBox);
-		VBox fieldsBox = new VBox(40, myInfoBox, sucPredBox);
+		VBox fieldsBox = new VBox(20, myInfoBox, sucPredBox);
 		
 		
 	    //input = new FileInputStream("resources/images/leave_button.png");
@@ -447,15 +447,8 @@ public class Main extends Application {
 		         
 		         Optional<String> result = dialog.showAndWait();
 		         if (result.isPresent()){
-		               
-		             try {
-		            	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Main.localNode.getID());
-						Main.localNode.sendPacket(lp,Inet4Address.getByName("192.168.1.3"));
-					} catch (UnknownHostException e) {
-						System.out.println("Morri na hora de enviar o pacote do lookup.");
-						e.printStackTrace();
-					}
-		             
+		        	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Integer.parseInt(result.get()));
+		        	 Main.localNode.sendPacket(lp,Main.localNode.getSucessor().getIp());
 		         }
 		         event.consume();
 		     }

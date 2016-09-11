@@ -99,10 +99,10 @@ public class JoinResponsePacket extends ChordPacket {
 	}
 
 	public String toString() {
-		return String.format( "[JoinResponse]\n"
+		return String.format( "[JoinResponse - %s]\n"
 				+ "code: %Xh\n"
 				+ "status: %Xh\n"
-				+ "sucessorID: %Xh\n",this.code,this.status,this.sucessorID) 
+				+ "sucessorID: %Xh\n",getCurrentTime(), this.code,this.status,this.sucessorID) 
 				+ "sucessorIP: " + this.sucessorIP.getHostAddress() 
 				+ String.format( "\npredecessorID: %Xh",this.predecessorID)  
 				+ "\npredecessorIP: " + this.predecessorIP.getHostAddress() 

@@ -67,10 +67,10 @@ public class LookupResponsePacket extends ChordPacket {
 	
 	@Override 
 	public String toString(){
-		return String.format("[LookupResponse]\n"
+		return String.format("[LookupResponse - %s]\n"
 				+ "code: %Xh\n"
 				+ "wantedID: %Xh\n"
-				+ "sucessorID: %Xh\n",this.code, this.wantedID, this.sucessorID)
+				+ "sucessorID: %Xh\n",getCurrentTime(), this.code, this.wantedID, this.sucessorID)
 				+ "sucessorIP: " + this.sucessorIp.getHostAddress() + "\n"
 				+ "\n";
 	}

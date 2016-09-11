@@ -58,10 +58,10 @@ public class UpdateResponsePacket extends ChordPacket {
 	
 	@Override
 	public String toString(){
-		return String.format("[UpdateResponse]\n"
+		return String.format("[UpdateResponse - %s]\n"
 				+ "code: %Xh\n"
 				+ "status: %Xh\n"
-				+ "originID: %Xh",this.code,this.status,this.originID)
+				+ "originID: %Xh",getCurrentTime(), this.code,this.status,this.originID)
 				+ "\n\n";
 	}
 

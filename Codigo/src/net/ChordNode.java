@@ -217,16 +217,8 @@ public class ChordNode extends Thread {
 		
 		JoinResponsePacket jrp = new JoinResponsePacket(confirmacaoErro, this.ID, this.ip, oldPredecessor.getID(),
 				oldPredecessor.getIp());
-		
-		byte[] jrpArray = jrp.toByteArray();
-		DatagramPacket dp = new DatagramPacket(jrpArray, JoinResponsePacket.packetSize, incomingIp, UDP_PORT);
-		
-		try {
-			socket.send(dp);
-		} catch (IOException ioe) {
-			// TODO: O que fazer nesse caso? Imprimir mensagem de erro na
-			// tela? Esperar um tempo e mandar de novo?
-		}
+	
+		sendPacket(jrp,incomingIp);
 	}
 
 	public void handleJoinResponse(JoinResponsePacket jrp) {
@@ -355,7 +347,19 @@ public class ChordNode extends Thread {
 			
 			sendPacket(lrp,lp.getOriginIp());
 
+		} else if(this.getSucessor() == this.getPredecessor()){
+			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros para o sucessor e 
+			// antecessor são iguais. Podemos comparar o objetos diretamente pois nesse caso o objeto
+			// apontado é o mesmo, visto a forma como o nó é criado na função createRing()
+			
+			System.out.println("Cai no caso do kra sozinho!");
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+					this.getIp());
+			
+			sendPacket(lrp,lp.getOriginIp());
+			
 		} else if (this.ID > lp.getWantedID() && this.getPredecessor().getID() < lp.getWantedID()) {
+		
 			// O ID procurado fica entre o nó e seu antecessor. Logo, retorna o
 			// ID do nó.
 
@@ -431,6 +435,7 @@ public class ChordNode extends Thread {
 		
 		ChordNode newSucessor = new ChordNode(up.getNewSucessorID(),up.getNewSucessorIP());
 		this.setSucessor(newSucessor);
+		Main.setSucessorUI(newSucessor);
 	}
 
 	public void handleUpdateResponse(UpdateResponsePacket urp) {
@@ -474,7 +479,7 @@ public class ChordNode extends Thread {
 			socket.receive(packet);
 			
 		}catch(SocketTimeoutException se){
-			System.out.println("ChordNode.receivePacket(): Fim do timeout do socket. Parando e reiniciando.");
+			//System.out.println("ChordNode.receivePacket(): Fim do timeout do socket. Parando e reiniciando.");
 			packet = null;
 		}catch(IOException e){
 			System.out.println("ChordNode.receivePacket(): Erro na hora de receber pacotes.");
@@ -495,11 +500,14 @@ public class ChordNode extends Thread {
 		local.setSucessor(local);
 		local.setPredecessor(local);
 		
-		main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
+		Main.setSucessorUI(local);
+		Main.setPredecessorUI(local);
+
+		/*main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
 		main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
 		main.Main.predecessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
 		main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
-		
+		*/
 		local.start();
 		
 		return local;

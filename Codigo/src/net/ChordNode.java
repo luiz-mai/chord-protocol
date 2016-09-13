@@ -331,27 +331,24 @@ public class ChordNode extends Thread {
 	}
 
 	public void handleLookup(LookupPacket lp) {
-		if (this.ID == lp.getWantedID()) {
+		
+		long localID = ((long) this.getId()) & 0xFFFFFFFFL;
+		long sucID = ((long) this.getSucessor().getId()) & 0xFFFFFFFFL;
+		long predecID = ((long) this.getPredecessor().getId()) & 0xFFFFFFFFL;
+		long wantedID = ((long) lp.getWantedID()) & 0xFFFFFFFFL;
+		
+		if (localID == wantedID) {
 			// O ID procurado é igual ao ID do nó
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
 					this.getIp());
 			
-			/*byte[] lrpArray = lrp.toByteArray();
-			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
-			try {
-				socket.send(dp);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
 			sendPacket(lrp,lp.getOriginIp());
 
-		} else if (this.ID != this.getSucessor().getID() && this.getSucessor() == this.getPredecessor()){
+		} else if (localID != sucID && this.getSucessor() == this.getPredecessor()){
 			//Aqui, a rede tem dois nós.
 			LookupResponsePacket lrp;
-			if(lp.getWantedID() > this.ID && lp.getWantedID() < this.getSucessor().getId()){
+			if(wantedID > localID && wantedID < sucID){
 				lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 						this.getSucessor().getIp());
 			} else {
@@ -360,7 +357,7 @@ public class ChordNode extends Thread {
 			}
 			sendPacket(lrp,lp.getOriginIp());
 		}
-			else if(this.ID == this.getSucessor().getID() && this.getSucessor() == this.getPredecessor()){
+			else if(localID == sucID && this.getSucessor() == this.getPredecessor()){
 			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros para o sucessor e 
 			// antecessor são iguais. Podemos comparar o objetos diretamente pois nesse caso o objeto
 			// apontado é o mesmo, visto a forma como o nó é criado na função createRing()
@@ -371,39 +368,22 @@ public class ChordNode extends Thread {
 			
 			sendPacket(lrp,lp.getOriginIp());
 			
-		} else if (this.ID > lp.getWantedID() && this.getPredecessor().getID() < lp.getWantedID()) {
+		} else if (localID > wantedID && predecID < wantedID) {
 		
 			// O ID procurado fica entre o nó e seu antecessor. Logo, retorna o
 			// ID do nó.
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
 					this.getIp());
-			/*byte[] lrpArray = lrp.toByteArray();
-			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
-
-			try {
-				socket.send(dp);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
 			
 			sendPacket(lrp,lp.getOriginIp());
 
-		} else if (this.ID < lp.getWantedID() && this.getSucessor().getID() > lp.getWantedID()) {
+		} else if (localID < wantedID && sucID > wantedID) {
 			// O ID procurado fica entre o nó e seu sucessor. Logo, retorna o ID
 			// do sucessor.
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 					this.getSucessor().getIp());
-			/*byte[] lrpArray = lrp.toByteArray();
-			DatagramPacket dp = new DatagramPacket(lrpArray, 13, Tools.intToIp(lp.getOriginIp()), UDP_PORT);
-			try {
-				socket.send(dp);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
 			
 			sendPacket(lrp,lp.getOriginIp());
 
@@ -411,15 +391,6 @@ public class ChordNode extends Thread {
 			// O nó atual não é capaz de definir o sucessor, então repassa o
 			// Lookup para o próximo nó.
 
-			/*byte[] lpArray = lp.toByteArray();
-			DatagramPacket dp = new DatagramPacket(lpArray, 13, this.getSucessor().getIp(), UDP_PORT);
-			try {
-				socket.send(dp);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
 			sendPacket(lp,this.getSucessor().getIp());
 
 		}

@@ -56,7 +56,6 @@ public class ChordNode extends Thread {
 		this.sucessor = null;
 		this.predecessor = null;
 		this.socket = null;
-
 	}
 
 	public int getID() {
@@ -345,19 +344,7 @@ public class ChordNode extends Thread {
 			
 			sendPacket(lrp,lp.getOriginIp());
 
-		} else if (localID != sucID && this.getSucessor() == this.getPredecessor()){
-			//Aqui, a rede tem dois nós.
-			LookupResponsePacket lrp;
-			if(wantedID > localID && wantedID < sucID){
-				lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
-						this.getSucessor().getIp());
-			} else {
-				lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-						this.getIp());
-			}
-			sendPacket(lrp,lp.getOriginIp());
-		}
-			else if(localID == sucID && this.getSucessor() == this.getPredecessor()){
+		}  else if(localID == sucID && this.getSucessor() == this.getPredecessor()){
 			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros para o sucessor e 
 			// antecessor são iguais. Podemos comparar o objetos diretamente pois nesse caso o objeto
 			// apontado é o mesmo, visto a forma como o nó é criado na função createRing()
@@ -368,6 +355,38 @@ public class ChordNode extends Thread {
 			
 			sendPacket(lrp,lp.getOriginIp());
 			
+		} else if (localID != sucID && this.getSucessor() == this.getPredecessor()){
+			//Aqui, a rede tem dois nós.
+			//Na situação de 2 nós, o ID do sucessor do nó pode ser maior ou menor que seu ID.
+			LookupResponsePacket lrp;
+			if(wantedID > localID && wantedID < sucID){
+				//Entre local e sucessor
+				lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+						this.getSucessor().getIp());
+			} else if (wantedID > sucID && wantedID < localID){
+				//Entre sucessor e local
+				lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+						this.getSucessor().getIp());
+			} else if (wantedID < localID && wantedID < sucID){
+				//Menor que ambos. Sucessor será o menor
+				if(localID < sucID){
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+							this.getIp());
+				} else {
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+							this.getSucessor().getIp());
+				}
+			} else {
+				//Maior que ambos. Sucessor será o menor
+				if(localID > sucID){
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+							this.getSucessor().getIp());
+				} else {
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+							this.getIp());
+				}
+			}
+			sendPacket(lrp,lp.getOriginIp());
 		} else if (localID > wantedID && predecID < wantedID) {
 		
 			// O ID procurado fica entre o nó e seu antecessor. Logo, retorna o

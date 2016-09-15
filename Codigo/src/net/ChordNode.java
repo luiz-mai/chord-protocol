@@ -685,6 +685,46 @@ public class ChordNode extends Thread {
 
 	}
 	
+	public static void leaveRing(ChordNode localNode){
+		
+		LeaveResponsePacket sucLeaveResponsePacket = null;
+		LeaveResponsePacket predLeaveResponsePacket = null;
+		LeavePacket lp = new LeavePacket(localNode.getID(),localNode.getSucessor().getID(), localNode.getSucessor().getIp(),localNode.getPredecessor().getID(), localNode.getPredecessor().getIp());
+
+		byte buffer[] = new byte[21];
+		
+		localNode.sendPacket(lp, localNode.getSucessor().getIp());
+		localNode.sendPacket(lp, localNode.getPredecessor().getIp());
+			
+
+		while(sucLeaveResponsePacket == null || predLeaveResponsePacket == null){
+			
+			DatagramPacket packet = localNode.receivePacket(buffer);
+			
+			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+			// Tentar novamente
+			if(packet == null)
+				continue;
+			
+			// Pegar o código do pacote recebido
+			byte code = ChordPacket.getPacketCode(packet);
+			
+			if(code == ChordPacket.LEAVE_RESP_CODE){
+				
+				LeaveResponsePacket lrp = new LeaveResponsePacket(buffer,packet.getOffset());
+				Main.showReceivedMessage(lrp);
+				
+				if(lrp.getOriginID() == localNode.getSucessor().getID()){
+					sucLeaveResponsePacket = lrp;
+				} else if (lrp.getOriginID() == localNode.getPredecessor().getID()){
+					predLeaveResponsePacket = lrp;
+				} else {
+					continue;
+				}
+			}
+		}
+	}
+	
 	public void closeSocket(){
 		socket.close();
 	}

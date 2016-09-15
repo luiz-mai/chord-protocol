@@ -691,13 +691,14 @@ public class ChordNode extends Thread {
 		LeaveResponsePacket predLeaveResponsePacket = null;
 		LeavePacket lp = new LeavePacket(localNode.getID(),localNode.getSucessor().getID(), localNode.getSucessor().getIp(),localNode.getPredecessor().getID(), localNode.getPredecessor().getIp());
 
-		byte buffer[] = new byte[21];
 		
 		localNode.sendPacket(lp, localNode.getSucessor().getIp());
 		localNode.sendPacket(lp, localNode.getPredecessor().getIp());
 			
 
 		while(sucLeaveResponsePacket == null || predLeaveResponsePacket == null){
+
+			byte buffer[] = new byte[21];
 			
 			DatagramPacket packet = localNode.receivePacket(buffer);
 			

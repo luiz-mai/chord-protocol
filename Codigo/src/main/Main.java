@@ -231,7 +231,7 @@ public class Main extends Application {
 		VBox sucessorBox = new VBox(5, labelSucessor, sucessorGrid);
 		sucessorBox.setAlignment(Pos.CENTER);
 
-		Text labelPredecessor = new Text("PREDECESSOR:");
+		Text labelPredecessor = new Text("ANTECESSOR:");
 		labelPredecessor.setTextAlignment(TextAlignment.CENTER);
 		labelPredecessor.setFill(Color.WHITE);
 		labelPredecessor.setFont(new Font(20));

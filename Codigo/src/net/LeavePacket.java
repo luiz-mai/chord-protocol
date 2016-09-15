@@ -104,9 +104,9 @@ public class LeavePacket extends ChordPacket {
 	@Override
 	public String toString(){
 		return String.format(" [Leave - %s]\n"
-				+ "code: %X\n"
-				+ "exitID: %d\n"
-				+ "exitSucID: %d\n",getCurrentTime(), this.code,this.exitID,this.exitSucID) 
+				+ "code: %Xh\n"
+				+ "exitID: %Xh\n"
+				+ "exitSucID: %Xh\n",getCurrentTime(), this.code,this.exitID,this.exitSucID) 
 				+ "\nexitSucIP: " + this.exitSucIP.getHostAddress() 
 				+ String.format( "\nexitPredecID: %d",this.exitPredecID) 
 				+ "\nexitPredecIP:" + this.exitPredecIP.getHostAddress() 

@@ -23,7 +23,7 @@ public class ChordNode extends Thread {
 
 	// Constante com a porta UDP a ser usada no protocolo
 	public static final int UDP_PORT = 12233;
-	public static final int TIMEOUT = 1000; //ms
+	public static final int TIMEOUT = 1000; // ms
 
 	// Variável que define se a thread do servidor deve continuar rodando
 	public boolean listen = true;
@@ -35,16 +35,17 @@ public class ChordNode extends Thread {
 		this.ip = ip;
 		this.sucessor = sucessor;
 		this.predecessor = predecessor;
-		
-		try{
-			this.socket = new DatagramSocket(UDP_PORT,ip);
-			
-			// Aqui vamos setar o timeout para o recebimento de pacotes pelo socket
+
+		try {
+			this.socket = new DatagramSocket(UDP_PORT, ip);
+
+			// Aqui vamos setar o timeout para o recebimento de pacotes pelo
+			// socket
 			// para que ele pare a cada TIMEOUT milisegundos
 			this.getSocket().setSoTimeout(ChordNode.TIMEOUT);
-		}catch(SocketException se){
-				System.out.println("Erro ao setar o timeout para o socket em ChordNode.joinRing()");
-				se.printStackTrace();
+		} catch (SocketException se) {
+			System.out.println("Erro ao setar o timeout para o socket em ChordNode.joinRing()");
+			se.printStackTrace();
 		}
 	}
 
@@ -93,96 +94,94 @@ public class ChordNode extends Thread {
 	public DatagramSocket getSocket() {
 		return socket;
 	}
-	
+
 	public void run() {
-		
-		try{
-			/* Setando o timeout para o socket. Ele só ficará bloqueado esperando
-			 * um pacote por no máximo 500ms (0.5s).
+
+		try {
+			/*
+			 * Setando o timeout para o socket. Ele só ficará bloqueado
+			 * esperando um pacote por no máximo 500ms (0.5s).
 			 */
 			this.socket.setSoTimeout(500);
-		}catch(SocketException se){
+		} catch (SocketException se) {
 			System.out.println("Erro ao setar o timeout para o socket em ChordNode.run()");
 			se.printStackTrace();
 		}
 
 		while (listen) {
 
-				// O tamanho do buffer para os pacotes é de 21 bytes pois esse é
-				// tamanho do maior pacote previsto pela aplicação: um envio da
-				// funcionalidade Leave.
-				byte[] buffer = new byte[21];
-				
-				
-			
-				DatagramPacket packet = receivePacket(buffer);
-				
-				if( packet == null )
-					continue;
+			// O tamanho do buffer para os pacotes é de 21 bytes pois esse é
+			// tamanho do maior pacote previsto pela aplicação: um envio da
+			// funcionalidade Leave.
+			byte[] buffer = new byte[21];
 
-				// Pegando o codigo do pacote (primeiro byte)
-				// TODO: Estou admitindo que o buffer é sempre realocado quando eu chamo packetReceive
-				// e que por isso o pacote começa no começo do buffer.
-				int offset = packet.getOffset();
-				
-				byte code = buffer[offset];
-				
-				Inet4Address incomingIp = (Inet4Address) packet.getAddress();
-				
-				switch (code) {
-				// Join
-				case ChordPacket.JOIN_CODE:
-					JoinPacket jp = new JoinPacket(buffer, offset);
-					Main.showReceivedMessage(jp);
-					handleJoin(jp, incomingIp);
-					break;
-				// Join Response
-				case ChordPacket.JOIN_RESP_CODE:
-					JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
-					Main.showReceivedMessage(jrp);
-					handleJoinResponse(jrp);
-					break;
-				// Leave
-				case ChordPacket.LEAVE_CODE:
-					LeavePacket lp = new LeavePacket(buffer, offset);
-					Main.showReceivedMessage(lp);
-					handleLeave(lp);
-					break;
-				// LeaveResponse
-				case ChordPacket.LEAVE_RESP_CODE:
-					LeaveResponsePacket lrp = new LeaveResponsePacket(buffer, offset);
-					Main.showReceivedMessage(lrp);
-					handleLeaveResponse(lrp);
-					break;
-				// Lookup
-				case ChordPacket.LOOKUP_CODE:
-					LookupPacket lkp = new LookupPacket(buffer, offset);
-					Main.showReceivedMessage(lkp);
-					handleLookup(lkp);
-					break;
-				// LookupResponse
-				case ChordPacket.LOOKUP_RESP_CODE:
-					LookupResponsePacket lkrp = new LookupResponsePacket(buffer, offset);
-					Main.showReceivedMessage(lkrp);
-					handleLookupResponse(lkrp);
-					break;
-				// Update
-				case ChordPacket.UPDATE_CODE:
-					UpdatePacket up = new UpdatePacket(buffer, offset);
-					Main.showReceivedMessage(up);
-					handleUpdate(up,incomingIp);
-					break;
-				// UpdateResponse
-				case ChordPacket.UPDATE_RESP_CODE:
-					UpdateResponsePacket urp = new UpdateResponsePacket(buffer, offset);
-					Main.showReceivedMessage(urp);
-					handleUpdateResponse(urp);
-					break;
-				default:
-					// Ignore
-				}
+			DatagramPacket packet = receivePacket(buffer);
 
-			
+			if (packet == null)
+				continue;
+
+			// Pegando o codigo do pacote (primeiro byte)
+			// TODO: Estou admitindo que o buffer é sempre realocado quando eu
+			// chamo packetReceive
+			// e que por isso o pacote começa no começo do buffer.
+			int offset = packet.getOffset();
+
+			byte code = buffer[offset];
+
+			Inet4Address incomingIp = (Inet4Address) packet.getAddress();
+
+			switch (code) {
+			// Join
+			case ChordPacket.JOIN_CODE:
+				JoinPacket jp = new JoinPacket(buffer, offset);
+				Main.showReceivedMessage(jp);
+				handleJoin(jp, incomingIp);
+				break;
+			// Join Response
+			case ChordPacket.JOIN_RESP_CODE:
+				JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
+				Main.showReceivedMessage(jrp);
+				handleJoinResponse(jrp);
+				break;
+			// Leave
+			case ChordPacket.LEAVE_CODE:
+				LeavePacket lp = new LeavePacket(buffer, offset);
+				Main.showReceivedMessage(lp);
+				handleLeave(lp);
+				break;
+			// LeaveResponse
+			case ChordPacket.LEAVE_RESP_CODE:
+				LeaveResponsePacket lrp = new LeaveResponsePacket(buffer, offset);
+				Main.showReceivedMessage(lrp);
+				handleLeaveResponse(lrp);
+				break;
+			// Lookup
+			case ChordPacket.LOOKUP_CODE:
+				LookupPacket lkp = new LookupPacket(buffer, offset);
+				Main.showReceivedMessage(lkp);
+				handleLookup(lkp);
+				break;
+			// LookupResponse
+			case ChordPacket.LOOKUP_RESP_CODE:
+				LookupResponsePacket lkrp = new LookupResponsePacket(buffer, offset);
+				Main.showReceivedMessage(lkrp);
+				handleLookupResponse(lkrp);
+				break;
+			// Update
+			case ChordPacket.UPDATE_CODE:
+				UpdatePacket up = new UpdatePacket(buffer, offset);
+				Main.showReceivedMessage(up);
+				handleUpdate(up, incomingIp);
+				break;
+			// UpdateResponse
+			case ChordPacket.UPDATE_RESP_CODE:
+				UpdateResponsePacket urp = new UpdateResponsePacket(buffer, offset);
+				Main.showReceivedMessage(urp);
+				handleUpdateResponse(urp);
+				break;
+			default:
+				// Ignore
+			}
 
 		}
 	}
@@ -190,71 +189,78 @@ public class ChordNode extends Thread {
 	public void handleJoin(JoinPacket jp, InetAddress incomingIp) {
 
 		byte confirmacaoErro;
-		
-		//Precisamos salvar uma referëncia para o antigo predecessor para não perdê-la na atualização
+
+		// Precisamos salvar uma referëncia para o antigo predecessor para não
+		// perdê-la na atualização
 		ChordNode oldPredecessor = this.predecessor;
-				
+
 		if (this.ID == jp.getNewNodeID()) {
 			// O nó que enviou o pacote tem o mesmo ID que o nó local. Responder
 			// com código de erro.
-			confirmacaoErro = 0;			
+			confirmacaoErro = 0;
 		} else {
 			// O novo nó pode ser inserido com segurança.
 			confirmacaoErro = 0x01;
-			
+
 			// Vamos atualizar o predecessor do nó local
-			ChordNode newNode = new ChordNode(jp.getNewNodeID(),incomingIp);
+			ChordNode newNode = new ChordNode(jp.getNewNodeID(), incomingIp);
 			this.setPredecessor(newNode);
 			Main.setPredecessorUI(newNode);
 		}
-		
+
 		/*
-		 * Decisão de projeto: Numa situação de erro, não foi especificado o que deveria ser 
-		 * retornado nos demais campos de JoinResponse. Por simplicidade, escolhemos retornar 
-		 * os mesmos valores que a situação sem erro. Cabe ao destinatário verificar o campos 
-		 * de confirmação/erro para determinar a validade das informações contidas no pacote.
+		 * Decisão de projeto: Numa situação de erro, não foi especificado o que
+		 * deveria ser retornado nos demais campos de JoinResponse. Por
+		 * simplicidade, escolhemos retornar os mesmos valores que a situação
+		 * sem erro. Cabe ao destinatário verificar o campos de confirmação/erro
+		 * para determinar a validade das informações contidas no pacote.
 		 */
-		
+
 		JoinResponsePacket jrp = new JoinResponsePacket(confirmacaoErro, this.ID, this.ip, oldPredecessor.getID(),
 				oldPredecessor.getIp());
-	
-		sendPacket(jrp,incomingIp);
+
+		sendPacket(jrp, incomingIp);
 	}
 
 	public void handleJoinResponse(JoinResponsePacket jrp) {
-		/* A única situação na qual recebemos um JoinResponse é quando queremos entrar
-		 * na rede e enviamos um Join para um nó que já pertença a ela. Esse nó então
-		 * responde a solicitação com um JoinResponse, contendo as informações sobre
-		 * antecessor e sucessor.
+		/*
+		 * A única situação na qual recebemos um JoinResponse é quando queremos
+		 * entrar na rede e enviamos um Join para um nó que já pertença a ela.
+		 * Esse nó então responde a solicitação com um JoinResponse, contendo as
+		 * informações sobre antecessor e sucessor.
 		 */
-		
-		if(jrp.getStatus() == (byte) 0x00){
-			/* TODO: em que situação haveria um erro no Join? O caso de ID repetido não
-			 * é tratado quando fazemos o lookup e recebemos o mesmo ID como sucessor?
-			 * Além disso, o que fazer quando recebermos um erro assim? Reenviar o Join?
+
+		if (jrp.getStatus() == (byte) 0x00) {
+			/*
+			 * TODO: em que situação haveria um erro no Join? O caso de ID
+			 * repetido não é tratado quando fazemos o lookup e recebemos o
+			 * mesmo ID como sucessor? Além disso, o que fazer quando recebermos
+			 * um erro assim? Reenviar o Join?
 			 */
-		}else{
+		} else {
 			// Join sem erro.
-			
-			/* Só atualizar os ponteiros de sucessor e predecessor se eles já não estiverem
-			 * setados. Temo que fazer isso pq essa JoinResponse pode ter sido enviada por engano
-			 * e caso executemos o procedimento padrão para tratá-la podemos bagunçar a rede
-			 * toda.
+
+			/*
+			 * Só atualizar os ponteiros de sucessor e predecessor se eles já
+			 * não estiverem setados. Temo que fazer isso pq essa JoinResponse
+			 * pode ter sido enviada por engano e caso executemos o procedimento
+			 * padrão para tratá-la podemos bagunçar a rede toda.
 			 */
-			
-			if(this.getSucessor() == null && this.getPredecessor() == null){
-				ChordNode newSucessor = new ChordNode(jrp.getSucessorID(),jrp.getSucessorIP());
-				ChordNode newPredecessor = new ChordNode(jrp.getPredecessorID(),jrp.getPredecessorIP());
-				
+
+			if (this.getSucessor() == null && this.getPredecessor() == null) {
+				ChordNode newSucessor = new ChordNode(jrp.getSucessorID(), jrp.getSucessorIP());
+				ChordNode newPredecessor = new ChordNode(jrp.getPredecessorID(), jrp.getPredecessorIP());
+
 				this.setSucessor(newSucessor);
 				this.setPredecessor(newPredecessor);
-				
-				// Agora precisamos avisar o nosso antecessor que entramos na rede
+
+				// Agora precisamos avisar o nosso antecessor que entramos na
+				// rede
 				// Para isso mandamos um Update
-				
+
 				// TODO: Os dois primeiros campos vão ser iguais mesmo?
-				UpdatePacket up = new UpdatePacket(this.getID(),this.getID(),this.getIp());
-				sendPacket(up,this.getPredecessor().getIp());
+				UpdatePacket up = new UpdatePacket(this.getID(), this.getID(), this.getIp());
+				sendPacket(up, this.getPredecessor().getIp());
 			}
 			// E o caso de apenas um deles ser nulo? Precisamos tratar?
 		}
@@ -262,140 +268,146 @@ public class ChordNode extends Thread {
 
 	public void handleLeave(LeavePacket lp) {
 		/*
-		 * Recebemos um Leave quando ou o nosso antecessor ou sucessor desejam sair da rede.
-		 * Nesse caso, precisamos checar qual dos dois é que está mandando essa mensagem e
-		 * atualizar o ponteiro correspondentemente.
+		 * Recebemos um Leave quando ou o nosso antecessor ou sucessor desejam
+		 * sair da rede. Nesse caso, precisamos checar qual dos dois é que está
+		 * mandando essa mensagem e atualizar o ponteiro correspondentemente.
 		 */
-		
+
 		// ID do nó que está saindo da rede.
 		int senderID = lp.getExitID();
-		
-		if( senderID == this.getSucessor().getID() ){
+
+		if (senderID == this.getSucessor().getID()) {
 			// É o sucessor quem está saindo da rede.
-			
-			// Precisamos salvar o IP do nó que está saindo da rede para podermos enviar a resposta
+
+			// Precisamos salvar o IP do nó que está saindo da rede para
+			// podermos enviar a resposta
 			Inet4Address oldSucessorIP = this.getSucessor().getIp();
-			
-			ChordNode newSucessor = new ChordNode(lp.getExitSucID(),lp.getExitSucIP());
+
+			ChordNode newSucessor = new ChordNode(lp.getExitSucID(), lp.getExitSucIP());
 			this.setSucessor(newSucessor);
-			
-			/* Tendo atualizado o sucessor, precisamos enviar uma mensagem de confirmação
-			 * para o nó que está saindo da rede.
+			Main.setSucessorUI(this.getSucessor());
+
+			/*
+			 * Tendo atualizado o sucessor, precisamos enviar uma mensagem de
+			 * confirmação para o nó que está saindo da rede.
 			 */
-			
-			sendPacket(new LeaveResponsePacket(this.getID()),oldSucessorIP);
-			
-		}else if (senderID == this.getPredecessor().getID()){
+
+			sendPacket(new LeaveResponsePacket(this.getID()), oldSucessorIP);
+
+		} else if (senderID == this.getPredecessor().getID()) {
 			// É o predecessor quem está saindo da rede.
-			
-			// Precisamos salvar o IP do nó que está saindo da rede para podermos enviar a resposta
+
+			// Precisamos salvar o IP do nó que está saindo da rede para
+			// podermos enviar a resposta
 			Inet4Address oldPredecIP = this.getPredecessor().getIp();
-		
-			ChordNode newPredecessor = new ChordNode(lp.getExitPredecID(),lp.getExitPredecIP());
+
+			ChordNode newPredecessor = new ChordNode(lp.getExitPredecID(), lp.getExitPredecIP());
 			this.setPredecessor(newPredecessor);
-			
-			/* Tendo atualizado o sucessor, precisamos enviar uma mensagem de confirmação
-			 * para o nó que está saindo da rede.
+			Main.setPredecessorUI(this.getPredecessor());
+			/*
+			 * Tendo atualizado o predecessor, precisamos enviar uma mensagem de
+			 * confirmação para o nó que está saindo da rede.
 			 */
-			
-			sendPacket(new LeaveResponsePacket(this.getID()),oldPredecIP);
-			
-		}else{
-			// O ID do pacote que enviou a mensagem não corresponde nem ao sucessor nem ao
+
+			sendPacket(new LeaveResponsePacket(this.getID()), oldPredecIP);
+
+		} else {
+			// O ID do pacote que enviou a mensagem não corresponde nem ao
+			// sucessor nem ao
 			// predecessor. Deve ter sido enviado por engano.
-			
+
 			// TODO: Ignorar?
 		}
 	}
 
 	public void handleLeaveResponse(LeaveResponsePacket lrp) {
-		/* TODO: Esse caso é um pouco mais complexo. Por que receberemos
-		 * pacotes desse tipo quando estivermos saindo da rede. Então precisamos
-		 * enviar um pacote de Leave para os vizinhos e esperar 2 pacotes
+		/*
+		 * TODO: Esse caso é um pouco mais complexo. Por que receberemos pacotes
+		 * desse tipo quando estivermos saindo da rede. Então precisamos enviar
+		 * um pacote de Leave para os vizinhos e esperar 2 pacotes
 		 * LeaveResponse, um de cada um, para então sabermos que já podemos sair
-		 * efetivamente da rede. Então precisamos setar esse "OK, pode sair" em alguma 
-		 * variável da classe ou algo assim.
+		 * efetivamente da rede. Então precisamos setar esse "OK, pode sair" em
+		 * alguma variável da classe ou algo assim.
 		 */
-		
+
 		int senderID = lrp.getOriginID();
-		
-		if(senderID == this.getSucessor().getID()){
+
+		if (senderID == this.getSucessor().getID()) {
 			// Sucessor OK
-		}else if (senderID == this.getPredecessor().getID()){
+		} else if (senderID == this.getPredecessor().getID()) {
 			// Predecessor OK
-		}else{
+		} else {
 			// Nenhum dos dois. Engano?
 			// Ignorar
 		}
 	}
 
 	public void handleLookup(LookupPacket lp) {
-		
+
 		long localID = ((long) this.getId()) & 0xFFFFFFFFL;
 		long sucID = ((long) this.getSucessor().getId()) & 0xFFFFFFFFL;
 		long predecID = ((long) this.getPredecessor().getId()) & 0xFFFFFFFFL;
 		long wantedID = ((long) lp.getWantedID()) & 0xFFFFFFFFL;
-		
+
 		if (localID == wantedID) {
 			// O ID procurado é igual ao ID do nó
 
-			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-					this.getIp());
-			
-			sendPacket(lrp,lp.getOriginIp());
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
 
-		}  else if(localID == sucID && this.getSucessor() == this.getPredecessor()){
-			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros para o sucessor e 
-			// antecessor são iguais. Podemos comparar o objetos diretamente pois nesse caso o objeto
-			// apontado é o mesmo, visto a forma como o nó é criado na função createRing()
-			
-			//TODO: /*deletar*/ System.out.println("Cai no caso do kra sozinho!");
-			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-					this.getIp());
-			
-			sendPacket(lrp,lp.getOriginIp());
-			
-		} else if (localID != sucID && this.getSucessor() == this.getPredecessor()){
-			//Aqui, a rede tem dois nós.
-			//Na situação de 2 nós, o ID do sucessor do nó pode ser maior ou menor que seu ID.
+			sendPacket(lrp, lp.getOriginIp());
+
+		} else if (localID == sucID && this.getSucessor() == this.getPredecessor()) {
+			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros
+			// para o sucessor e
+			// antecessor são iguais. Podemos comparar o objetos diretamente
+			// pois nesse caso o objeto
+			// apontado é o mesmo, visto a forma como o nó é criado na função
+			// createRing()
+
+			// TODO: /*deletar*/ System.out.println("Cai no caso do kra
+			// sozinho!");
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
+
+			sendPacket(lrp, lp.getOriginIp());
+
+		} else if (localID != sucID && this.getSucessor() == this.getPredecessor()) {
+			// Aqui, a rede tem dois nós.
+			// Na situação de 2 nós, o ID do sucessor do nó pode ser maior ou
+			// menor que seu ID.
 			LookupResponsePacket lrp;
-			if(wantedID > localID && wantedID < sucID){
-				//Entre local e sucessor
+			if (wantedID > localID && wantedID < sucID) {
+				// Entre local e sucessor
 				lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 						this.getSucessor().getIp());
-			} else if (wantedID > sucID && wantedID < localID){
-				//Entre sucessor e local
-				lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-						this.getSucessor().getIp());
-			} else if (wantedID < localID && wantedID < sucID){
-				//Menor que ambos. Sucessor será o menor
-				if(localID < sucID){
-					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-							this.getIp());
+			} else if (wantedID > sucID && wantedID < localID) {
+				// Entre sucessor e local
+				lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getSucessor().getIp());
+			} else if (wantedID < localID && wantedID < sucID) {
+				// Menor que ambos. Sucessor será o menor
+				if (localID < sucID) {
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
 				} else {
 					lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 							this.getSucessor().getIp());
 				}
 			} else {
-				//Maior que ambos. Sucessor será o menor
-				if(localID > sucID){
+				// Maior que ambos. Sucessor será o menor
+				if (localID > sucID) {
 					lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 							this.getSucessor().getIp());
 				} else {
-					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-							this.getIp());
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
 				}
 			}
-			sendPacket(lrp,lp.getOriginIp());
+			sendPacket(lrp, lp.getOriginIp());
 		} else if (localID > wantedID && predecID < wantedID) {
-		
+
 			// O ID procurado fica entre o nó e seu antecessor. Logo, retorna o
 			// ID do nó.
 
-			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
-					this.getIp());
-			
-			sendPacket(lrp,lp.getOriginIp());
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
+
+			sendPacket(lrp, lp.getOriginIp());
 
 		} else if (localID < wantedID && sucID > wantedID) {
 			// O ID procurado fica entre o nó e seu sucessor. Logo, retorna o ID
@@ -403,70 +415,73 @@ public class ChordNode extends Thread {
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
 					this.getSucessor().getIp());
-			
-			sendPacket(lrp,lp.getOriginIp());
+
+			sendPacket(lrp, lp.getOriginIp());
 
 		} else {
 			// O nó atual não é capaz de definir o sucessor, então repassa o
 			// Lookup para o próximo nó.
 
-			sendPacket(lp,this.getSucessor().getIp());
+			sendPacket(lp, this.getSucessor().getIp());
 
 		}
 	}
 
 	public void handleLookupResponse(LookupResponsePacket lrp) {
-		
-		if(this.getSucessor() == null || this.getPredecessor() == null){
+
+		if (this.getSucessor() == null || this.getPredecessor() == null) {
 			// Nó acabou de ser criado e ainda não tem sucessor e predecessor.
 			// Ao receber um LookupResponse, o nó deve atualizar seu sucessor.
-			
-			ChordNode sucessor = new ChordNode(lrp.getSucessorID(),lrp.getSucessorIp());
+
+			ChordNode sucessor = new ChordNode(lrp.getSucessorID(), lrp.getSucessorIp());
 			this.setSucessor(sucessor);
-			
-			//TODO: Esse eh o local correto de colocar isso mesmo?
+
+			// TODO: Esse eh o local correto de colocar isso mesmo?
 			Main.setSucessorUI(sucessor);
-			
-		}else{
-			System.out.printf("O sucessor do ID procurado tem o ID %d e o seu IP é ",lrp.getSucessorID(),lrp.getSucessorIp().toString());
+
+		} else {
+			System.out.printf("O sucessor do ID procurado tem o ID %d e o seu IP é ", lrp.getSucessorID(),
+					lrp.getSucessorIp().toString());
 		}
 
 	}
 
 	public void handleUpdate(UpdatePacket up, Inet4Address incomingIP) {
-		/* Quando recebemos um update, quer dizer que um novo nó entrou
-		 * na rede e ele é o novo sucessor do nó local. Portanto, devemos
-		 * atualizar o ponteiro para o sucessor.
+		/*
+		 * Quando recebemos um update, quer dizer que um novo nó entrou na rede
+		 * e ele é o novo sucessor do nó local. Portanto, devemos atualizar o
+		 * ponteiro para o sucessor.
 		 */
-		
-		ChordNode newSucessor = new ChordNode(up.getNewSucessorID(),up.getNewSucessorIP());
+
+		ChordNode newSucessor = new ChordNode(up.getNewSucessorID(), up.getNewSucessorIP());
 		this.setSucessor(newSucessor);
 		Main.setSucessorUI(newSucessor);
-		
-		UpdateResponsePacket urp = new UpdateResponsePacket((byte) 1,this.getID());
-		sendPacket(urp,incomingIP);
+
+		UpdateResponsePacket urp = new UpdateResponsePacket((byte) 1, this.getID());
+		sendPacket(urp, incomingIP);
 	}
 
 	public void handleUpdateResponse(UpdateResponsePacket urp) {
 
-		if(urp.getStatus() == (byte) 0x00){
-			/* TODO: em que situação haveria um erro no Update?
-			 * Reenviar a mensagem em caso de erro?
+		if (urp.getStatus() == (byte) 0x00) {
+			/*
+			 * TODO: em que situação haveria um erro no Update? Reenviar a
+			 * mensagem em caso de erro?
 			 */
-		}else{
+		} else {
 			// TODO: Acho que nao precisa fazer nada haha.
 		}
-		
+
 	}
-	
-	public void sendPacket(ChordPacket cp, InetAddress destIP){
-		
+
+	public void sendPacket(ChordPacket cp, InetAddress destIP) {
+
 		byte[] cpArray = cp.toByteArray();
 		DatagramPacket dp = new DatagramPacket(cpArray, cpArray.length, destIP, UDP_PORT);
-		
+
 		// Adicionar pacote enviado à GUI
 		main.Main.sentMessages.add(cp.toString());
-		
+
 		try {
 			socket.send(dp);
 		} catch (IOException e) {
@@ -474,261 +489,311 @@ public class ChordNode extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
-	public DatagramPacket receivePacket(byte[] buffer){
-		
+
+	public DatagramPacket receivePacket(byte[] buffer) {
+
 		DatagramPacket packet = null;
-		
-		try{
-			
+
+		try {
+
 			Inet4Address incomingIp = (Inet4Address) Inet4Address.getByName("0.0.0.0");
 
 			// Esperar o recebimento de um pacote
 			packet = new DatagramPacket(buffer, buffer.length, incomingIp, UDP_PORT);
 			socket.receive(packet);
-			
-		}catch(SocketTimeoutException se){
-			//System.out.println("ChordNode.receivePacket(): Fim do timeout do socket. Parando e reiniciando.");
+
+		} catch (SocketTimeoutException se) {
+			// System.out.println("ChordNode.receivePacket(): Fim do timeout do
+			// socket. Parando e reiniciando.");
 			packet = null;
-		}catch(IOException e){
+		} catch (IOException e) {
 			System.out.println("ChordNode.receivePacket(): Erro na hora de receber pacotes.");
 			System.exit(1);
 		}
-		
+
 		return packet;
 	}
-	
-	public static ChordNode createRing(Inet4Address ipLocal){
-		
+
+	public static ChordNode createRing(Inet4Address ipLocal) {
+
 		// Gerando id aleatoriamente
 		int id = (new Random()).nextInt();
-		
-		ChordNode local = new ChordNode(id,ipLocal,null,null);
-		
-		// Como o nó ainda está sozinho na rede, sucessor e antecessor devem apontar pro próprio objeto
+
+		ChordNode local = new ChordNode(id, ipLocal, null, null);
+
+		// Como o nó ainda está sozinho na rede, sucessor e antecessor devem
+		// apontar pro próprio objeto
 		local.setSucessor(local);
 		local.setPredecessor(local);
-		
+
 		// Atualizar infos na UI
 		Main.setSucessorUI(local);
 		Main.setPredecessorUI(local);
 		Main.setMyselfUI(local);
 
-		/*main.Main.sucessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
-		main.Main.sucessorIp.setText(local.getIp().getHostAddress()); 
-		main.Main.predecessorID.setText(Integer.toHexString(local.getID()).toUpperCase()); 
-		main.Main.predecessorIp.setText(local.getIp().getHostAddress()); 
-		*/
+		/*
+		 * main.Main.sucessorID.setText(Integer.toHexString(local.getID()).
+		 * toUpperCase());
+		 * main.Main.sucessorIp.setText(local.getIp().getHostAddress());
+		 * main.Main.predecessorID.setText(Integer.toHexString(local.getID()).
+		 * toUpperCase());
+		 * main.Main.predecessorIp.setText(local.getIp().getHostAddress());
+		 */
 		local.start();
-		
+
 		return local;
 	}
-	
-	public static void joinRing(Inet4Address ipLocal, Inet4Address knownHost){
-		
+
+	public static void joinRing(Inet4Address ipLocal, Inet4Address knownHost) {
+
 		// Gerando id aleatoriamente
 		int id = (new Random(1000)).nextInt();
 		int joinAttempts = 0;
 		int updateAttempts = 0;
-		
-		ChordNode local = new ChordNode(id,ipLocal,null,null);
-		
+
+		ChordNode local = new ChordNode(id, ipLocal, null, null);
+
 		// Passo 1: Fazer um lookup pelo ID que acabamos de criar
-		
+
 		LookupResponsePacket lrp = null;
-		
-		while(lrp == null){
+
+		while (lrp == null) {
 			byte buffer[] = new byte[21];
-			
-			//TODO: Eh correto colocar o ID de origem como sendo desse kra que ainda ta fora da rede?
-			LookupPacket lp = new LookupPacket(local.getID(),local.getIp(),local.getID());
+
+			// TODO: Eh correto colocar o ID de origem como sendo desse kra que
+			// ainda ta fora da rede?
+			LookupPacket lp = new LookupPacket(local.getID(), local.getIp(), local.getID());
 			local.sendPacket(lp, knownHost);
-			
+
 			DatagramPacket packet = local.receivePacket(buffer);
-			
-			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+
+			// Se o pacote recebido for nulo significa que houve um timeout e
+			// não recebemos nada
 			// Tentar novamente
-			if(packet == null)
+			if (packet == null)
 				continue;
-			
+
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
-			
-			if(code == ChordPacket.LOOKUP_RESP_CODE){
-				
-				lrp = new LookupResponsePacket(buffer,packet.getOffset());
+
+			if (code == ChordPacket.LOOKUP_RESP_CODE) {
+
+				lrp = new LookupResponsePacket(buffer, packet.getOffset());
 				Main.showReceivedMessage(lrp);
-				
-				if(lrp.getSucessorID() == local.getID()){
+
+				if (lrp.getSucessorID() == local.getID()) {
 					// O ID gerado é repetido. Vamos gerar um novo.
 					local.setID((new Random(10000)).nextInt());
 					lrp = null;
-					continue;	
+					continue;
 				}
-				
+
 				// Setaremos o sucessor e antecessor na resposta ao Join
-				
+
 			}
-			
+
 		}
-		
+
 		// Atualizar info do no local na UI
 		Main.setMyselfUI(local);
-		
+
 		// Passo 2: Enviar uma mensagem de Join para o nosso sucessor
 		JoinResponsePacket jrp = null;
-		
-		while(jrp == null){
-			
+
+		while (jrp == null) {
+
 			byte buffer[] = new byte[21];
-			
+
 			JoinPacket jp = new JoinPacket(local.getID());
-			
+
 			Inet4Address sucessorIP = lrp.getSucessorIp();
-			
-			local.sendPacket(jp,sucessorIP);
-			
+
+			local.sendPacket(jp, sucessorIP);
+
 			DatagramPacket packet = local.receivePacket(buffer);
-			
-			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+
+			// Se o pacote recebido for nulo significa que houve um timeout e
+			// não recebemos nada
 			// Tentar novamente
-			if(packet == null)
+			if (packet == null)
 				continue;
-			
+
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
-			
-			if(code == ChordPacket.JOIN_RESP_CODE){
-				
+
+			if (code == ChordPacket.JOIN_RESP_CODE) {
+
 				joinAttempts++;
-				
-				jrp = new JoinResponsePacket(buffer,packet.getOffset());
+
+				jrp = new JoinResponsePacket(buffer, packet.getOffset());
 				Main.showReceivedMessage(jrp);
-				
-				if(jrp.getStatus() != 0){
+
+				if (jrp.getStatus() != 0) {
 					// Não houve erro no Join
-					
-					// Agora precisamos atualizar o sucessor e antecessor do nó local
-					ChordNode suc = new ChordNode(jrp.getSucessorID(),jrp.getSucessorIP());
-					ChordNode ant = new ChordNode(jrp.getPredecessorID(),jrp.getPredecessorIP());
+
+					// Agora precisamos atualizar o sucessor e antecessor do nó
+					// local
+					ChordNode suc = new ChordNode(jrp.getSucessorID(), jrp.getSucessorIP());
+					ChordNode ant = new ChordNode(jrp.getPredecessorID(), jrp.getPredecessorIP());
 					local.setSucessor(suc);
 					local.setPredecessor(ant);
-					
+
 					// Atualizar as infos de sucessor e antecessor na UI
 					Main.setSucessorUI(suc);
 					Main.setPredecessorUI(ant);
-					
-				}else{
+
+				} else {
 					// Houve erro no Join. Vamos tentar novamente.
-					if(joinAttempts >= 10){
-						//Evita que entre em um loop infinito
+					if (joinAttempts >= 10) {
+						// Evita que entre em um loop infinito
 						local.closeSocket();
 						System.exit(0);
 					}
 					jrp = null;
 					continue;
 				}
-				
+
 			}
-			
+
 		}
-		
-		// Passo 3: O último passo para entrarmos na rede é mandar um Update para o nosso antecessor
-		
+
+		// Passo 3: O último passo para entrarmos na rede é mandar um Update
+		// para o nosso antecessor
+
 		UpdateResponsePacket urp = null;
-		
-		while(urp == null){
-			
+
+		while (urp == null) {
+
 			byte buffer[] = new byte[21];
-			
-			UpdatePacket up = new UpdatePacket(local.getID(),local.getID(),local.getIp());
-			
+
+			UpdatePacket up = new UpdatePacket(local.getID(), local.getID(), local.getIp());
+
 			Inet4Address predecIP = local.getPredecessor().getIp();
-			
-			local.sendPacket(up,predecIP);
-			
+
+			local.sendPacket(up, predecIP);
+
 			DatagramPacket packet = local.receivePacket(buffer);
-			
-			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
+
+			// Se o pacote recebido for nulo significa que houve um timeout e
+			// não recebemos nada
 			// Tentar novamente
-			if(packet == null)
+			if (packet == null)
 				continue;
-			
+
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
-			
-			if(code == ChordPacket.UPDATE_RESP_CODE){
-				
+
+			if (code == ChordPacket.UPDATE_RESP_CODE) {
+
 				updateAttempts++;
-				
-				urp = new UpdateResponsePacket(buffer,packet.getOffset());
+
+				urp = new UpdateResponsePacket(buffer, packet.getOffset());
 				Main.showReceivedMessage(urp);
-				
-				if(urp.getStatus() == 0){
+
+				if (urp.getStatus() == 0) {
 					// Houve erro no Update. Vamos tentar de novo.
-					if(updateAttempts >= 10){
-						//Evita que entre em um loop infinito
+					if (updateAttempts >= 10) {
+						// Evita que entre em um loop infinito
 						local.closeSocket();
 						System.exit(0);
 					}
 					urp = null;
 					continue;
-				}else{
-					//Ocorreu tudo bem.
+				} else {
+					// Ocorreu tudo bem.
 					Main.localNode = local;
 					local.start();
 				}
-				
+
 			}
-			
+
 		}
 
 	}
-	
-	public static void leaveRing(ChordNode localNode){
-		
+
+	public static void leaveRing(ChordNode localNode) {
+
 		LeaveResponsePacket sucLeaveResponsePacket = null;
 		LeaveResponsePacket predLeaveResponsePacket = null;
-		LeavePacket lp = new LeavePacket(localNode.getID(),localNode.getSucessor().getID(), localNode.getSucessor().getIp(),localNode.getPredecessor().getID(), localNode.getPredecessor().getIp());
+		LeavePacket lp = new LeavePacket(localNode.getID(), localNode.getSucessor().getID(),
+				localNode.getSucessor().getIp(), localNode.getPredecessor().getID(),
+				localNode.getPredecessor().getIp());
 
-		
-		localNode.sendPacket(lp, localNode.getSucessor().getIp());
-		localNode.sendPacket(lp, localNode.getPredecessor().getIp());
-			
+		// flag para sinalizar se o pacote ja foi enviado, para que possamos
+		// botar o envio dentro do while e nao enviar o mesmo pacote multiplas
+		// vezes
+		boolean alreadySent = false;
 
-		while(sucLeaveResponsePacket == null || predLeaveResponsePacket == null){
+		// Vamos setar o timeout do receive para infinito para evitar perder o
+		// pacote de resposta
+		try {
+			localNode.socket.setSoTimeout(0);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		while (sucLeaveResponsePacket == null) {
 
 			byte buffer[] = new byte[21];
-			
+
+			if (!alreadySent) {
+				localNode.sendPacket(lp, localNode.getSucessor().getIp());
+				alreadySent = true;
+			}
+
 			DatagramPacket packet = localNode.receivePacket(buffer);
-			
-			// Se o pacote recebido for nulo significa que houve um timeout e não recebemos nada
-			// Tentar novamente
-			if(packet == null)
-				continue;
-			
+
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
-			
-			if(code == ChordPacket.LEAVE_RESP_CODE){
+
+			if (code == ChordPacket.LEAVE_RESP_CODE) {
+
+				sucLeaveResponsePacket = new LeaveResponsePacket(buffer, packet.getOffset());
 				
-				LeaveResponsePacket lrp = new LeaveResponsePacket(buffer,packet.getOffset());
-				Main.showReceivedMessage(lrp);
-				
-				if(lrp.getOriginID() == localNode.getSucessor().getID()){
-					sucLeaveResponsePacket = lrp;
-				} else if (lrp.getOriginID() == localNode.getPredecessor().getID()){
-					predLeaveResponsePacket = lrp;
-				} else {
-					continue;
-				}
+				// Checar se foi o remetente que esparavamos.
+				if (sucLeaveResponsePacket.getOriginID() == localNode.getSucessor().getID())
+					break;
+				else
+					sucLeaveResponsePacket = null;
+
 			}
 		}
+
+		alreadySent = false;
+
+		while (predLeaveResponsePacket == null) {
+
+			byte buffer[] = new byte[21];
+
+			if (!alreadySent) {
+				alreadySent = true;
+				localNode.sendPacket(lp, localNode.getPredecessor().getIp());
+			}
+
+			DatagramPacket packet = localNode.receivePacket(buffer);
+
+			// Pegar o código do pacote recebido
+			byte code = ChordPacket.getPacketCode(packet);
+
+			if (code == ChordPacket.LEAVE_RESP_CODE) {
+
+				predLeaveResponsePacket = new LeaveResponsePacket(buffer, packet.getOffset());
+				
+				// Checar se foi o remetente que esparavamos.
+				if (predLeaveResponsePacket.getOriginID() == localNode.getPredecessor().getID())
+					break;
+				else
+					predLeaveResponsePacket = null;
+
+			}
+		}
+		
+		localNode.closeSocket();
 	}
-	
-	public void closeSocket(){
+
+	public void closeSocket() {
 		socket.close();
 	}
-	
 
 }

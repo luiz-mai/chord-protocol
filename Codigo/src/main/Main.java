@@ -457,10 +457,10 @@ public class Main extends Application {
 			//CLICOU NO BOTÃO DE "DEIXAR REDE"
 		     @Override
 		     public void handle(MouseEvent event) {
+		    	 localNode.listen = false;
 		    	 if(localNode.getID() != localNode.getSucessor().getID()){
 		    		 ChordNode.leaveRing(localNode);
 		    	 }
-	             localNode.closeSocket();
 	             System.exit(0);
 		         event.consume();
 		     }
@@ -472,10 +472,10 @@ public class Main extends Application {
         mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
             	try{
+            		localNode.listen = false;
             		if(localNode.getID() != localNode.getSucessor().getID()){
             			ChordNode.leaveRing(localNode);
             		}
-            		localNode.closeSocket();
             		System.exit(0);
             	} catch (NullPointerException npe ){
             		System.exit(0);

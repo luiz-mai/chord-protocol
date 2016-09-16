@@ -34,7 +34,7 @@ public abstract class ChordPacket {
 	
 	public static String getCurrentTime(){
 		Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+	    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
 	    return sdf.format(cal.getTime());
 	}
 }

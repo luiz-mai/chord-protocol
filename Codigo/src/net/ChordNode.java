@@ -344,10 +344,15 @@ public class ChordNode extends Thread {
 
 	public void handleLookup(LookupPacket lp) {
 
-		long localID = ((long) this.getId()) & 0xFFFFFFFFL;
-		long sucID = ((long) this.getSucessor().getId()) & 0xFFFFFFFFL;
-		long predecID = ((long) this.getPredecessor().getId()) & 0xFFFFFFFFL;
-		long wantedID = ((long) lp.getWantedID()) & 0xFFFFFFFFL;
+		int localID = this.getID();
+		int sucID = this.getSucessor().getID();
+		int predecID = this.getPredecessor().getID();
+		int wantedID = lp.getWantedID();
+		
+		System.out.println("localID: " + Integer.toHexString(localID).toUpperCase());
+		System.out.println("sucID: " + Integer.toHexString(sucID).toUpperCase());
+		System.out.println("predecID: " + Integer.toHexString(predecID).toUpperCase());
+		System.out.println("wantedID: " + Integer.toHexString(wantedID).toUpperCase() + "\n");
 
 		if (localID == wantedID) {
 			// O ID procurado é igual ao ID do nó
@@ -356,13 +361,9 @@ public class ChordNode extends Thread {
 
 			sendPacket(lrp, lp.getOriginIp());
 
-		} else if (localID == sucID && this.getSucessor() == this.getPredecessor()) {
-			// Nesse caso o nó atual está sozinho na rede, por isso os ponteiros
-			// para o sucessor e
-			// antecessor são iguais. Podemos comparar o objetos diretamente
-			// pois nesse caso o objeto
-			// apontado é o mesmo, visto a forma como o nó é criado na função
-			// createRing()
+		} else if (localID == sucID && sucID == predecID) {
+			// Nesse caso o nó atual está sozinho na rede, entao o sucessor de
+			// qualquer ID procurado eh o ID local
 
 			// TODO: /*deletar*/ System.out.println("Cai no caso do kra
 			// sozinho!");
@@ -750,7 +751,7 @@ public class ChordNode extends Thread {
 			if (code == ChordPacket.LEAVE_RESP_CODE) {
 
 				sucLeaveResponsePacket = new LeaveResponsePacket(buffer, packet.getOffset());
-				
+
 				// Checar se foi o remetente que esparavamos.
 				if (sucLeaveResponsePacket.getOriginID() == localNode.getSucessor().getID())
 					break;
@@ -779,7 +780,7 @@ public class ChordNode extends Thread {
 			if (code == ChordPacket.LEAVE_RESP_CODE) {
 
 				predLeaveResponsePacket = new LeaveResponsePacket(buffer, packet.getOffset());
-				
+
 				// Checar se foi o remetente que esparavamos.
 				if (predLeaveResponsePacket.getOriginID() == localNode.getPredecessor().getID())
 					break;
@@ -788,7 +789,7 @@ public class ChordNode extends Thread {
 
 			}
 		}
-		
+
 		localNode.closeSocket();
 	}
 

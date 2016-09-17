@@ -348,34 +348,82 @@ public class ChordNode extends Thread {
 		int sucID = this.getSucessor().getID();
 		int predecID = this.getPredecessor().getID();
 		int wantedID = lp.getWantedID();
-		
-		System.out.println("localID: " + Integer.toHexString(localID).toUpperCase());
-		System.out.println("sucID: " + Integer.toHexString(sucID).toUpperCase());
-		System.out.println("predecID: " + Integer.toHexString(predecID).toUpperCase());
-		System.out.println("wantedID: " + Integer.toHexString(wantedID).toUpperCase() + "\n");
 
-		if (localID == wantedID) {
-			// O ID procurado é igual ao ID do nó
+		if (Integer.compareUnsigned(localID, wantedID) == 0) {
+			// O ID procurado é igual ao ID do nó local
 
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
 
 			sendPacket(lrp, lp.getOriginIp());
 
-		} else if (localID == sucID && sucID == predecID) {
+		}
+		if (Integer.compareUnsigned(sucID, wantedID) == 0) {
+			// O ID procurado é igual ao ID do nó sucessor
+
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+					this.getSucessor().getIp());
+
+			sendPacket(lrp, lp.getOriginIp());
+
+		}
+		if (Integer.compareUnsigned(predecID, wantedID) == 0) {
+			// O ID procurado é igual ao ID do nó predecessor
+
+			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getPredecessor().getID(),
+					this.getPredecessor().getIp());
+
+			sendPacket(lrp, lp.getOriginIp());
+
+		} else if (Integer.compareUnsigned(localID, sucID) == 0 && Integer.compareUnsigned(sucID, predecID) == 0) {
 			// Nesse caso o nó atual está sozinho na rede, entao o sucessor de
 			// qualquer ID procurado eh o ID local
 
-			// TODO: /*deletar*/ System.out.println("Cai no caso do kra
-			// sozinho!");
 			LookupResponsePacket lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(), this.getIp());
 
 			sendPacket(lrp, lp.getOriginIp());
 
-		} else if (localID != sucID && this.getSucessor() == this.getPredecessor()) {
+		} else if (Integer.compareUnsigned(localID, sucID) != 0 && Integer.compareUnsigned(sucID, predecID) == 0) {
 			// Aqui, a rede tem dois nós.
-			// Na situação de 2 nós, o ID do sucessor do nó pode ser maior ou
-			// menor que seu ID.
+			// Na situação de 2 nós, há 6 possibilidades, divididas em dois
+			// subcasos. Sejam L o noh local e M o outro noh da rede e P o ID
+			// procurado.
+			//
+			// Subcaso 1: L < M
+			// 	a) P eh o menor de todos (P < L): P -> L -> M
+			// 	b) P esta entre os dois (L < P < M): L -> P -> M
+			//	c) P eh o maior de todos (P > M): L -> M -> P
+			//
+			// Subcaso 2: L > M
+			//	a) P eh o menor de todos (P < M): P -> M -> L
+			//	b) P esta entre os dois (M < P < L): M -> P -> L
+			//	c) P eh o maior de todos (P > L) : M -> L -> P
+			
 			LookupResponsePacket lrp;
+			
+			if (Integer.compareUnsigned(localID,sucID) < 0){
+				// Subcaso 1: L < M
+				
+				if(Integer.compareUnsigned(wantedID,localID) > 0 && Integer.compareUnsigned(wantedID,sucID) < 0){
+					// Caso 1b
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+							this.getSucessor().getIp());
+				}else{
+					// Casos 1a e 1c (nos dois o sucessor eh L)
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+							this.getIp());
+				}
+			}else{
+				// Subcaso 2: L > M
+				if(Integer.compareUnsigned(wantedID,sucID) > 0 && Integer.compareUnsigned(wantedID,localID) < 0){
+					// Caso 2b
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getID(),
+							this.getIp());
+				}else{
+					// Casos 2a e 2c (nos dois o sucessor eh M)
+					lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
+							this.getSucessor().getIp());
+				}
+			}
 			if (wantedID > localID && wantedID < sucID) {
 				// Entre local e sucessor
 				lrp = new LookupResponsePacket(lp.getWantedID(), this.getSucessor().getID(),
@@ -441,8 +489,9 @@ public class ChordNode extends Thread {
 			Main.setSucessorUI(sucessor);
 
 		} else {
-			System.out.printf("O sucessor do ID procurado tem o ID %d e o seu IP é ", lrp.getSucessorID(),
+			System.out.printf("O sucessor do ID procurado tem o ID %X e o seu IP é ", lrp.getSucessorID(),
 					lrp.getSucessorIp().toString());
+			System.out.println();
 		}
 
 	}

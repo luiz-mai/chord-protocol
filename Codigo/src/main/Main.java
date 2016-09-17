@@ -446,7 +446,7 @@ public class Main extends Application {
 		         
 		         Optional<String> result = dialog.showAndWait();
 		         if (result.isPresent()){
-		        	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Integer.parseInt(result.get()));
+		        	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Integer.parseUnsignedInt(result.get()));
 		        	 Main.localNode.sendPacket(lp,Main.localNode.getSucessor().getIp());
 		         }
 		         event.consume();

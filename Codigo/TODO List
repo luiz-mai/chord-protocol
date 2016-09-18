@@ -1,8 +1,2 @@
 TODO List
-- Ajeitar a impressão dos códigos dos pacotes para bater com a especificação do trabalho.
 - O programa tá imprimindo varias exceções reclamando que estamos adicionando mensagens à UI de uma thread diferente da thread da UI
-- Ao entrar numa rede, sair e entrar de novo, o nó continua sempre com o mesmo ID. Isso não deveria acontecer, a cada saída deveríamos
-	criar um novo ID aleatório e começar o processo todo de novo.
-- Adicionar entrada ID na aba "Fazer lookup" em formato hexadecimal (compativel com o que a gente mostra na GUI)
-- Adicionar IP de destino na GUI para as mensagens enviadas
-- Adicionar IP de origem na GUI para as mensagens recebidas

@@ -7,7 +7,9 @@ import java.nio.ByteBuffer;
 
 public class Tools {
 
-	// Converte um endereço IP para um inteiro
+	/*
+	 *  Converte um endereço IP para um inteiro
+	 */
 	public static int ipToInt(InetAddress ip) {
 		return ByteBuffer.wrap(ip.getAddress()).getInt();
 	}

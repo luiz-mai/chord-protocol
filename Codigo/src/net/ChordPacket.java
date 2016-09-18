@@ -24,8 +24,6 @@ public abstract class ChordPacket {
 	public static byte getPacketCode(DatagramPacket packet) {
 		int offset = packet.getOffset();
 		return packet.getData()[offset];
-		
-		
 	}
 
 	public byte getCode() {

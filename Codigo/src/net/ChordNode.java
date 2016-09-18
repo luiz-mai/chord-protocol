@@ -27,15 +27,15 @@ public class ChordNode extends Thread {
 
 	// Variável que define se a thread do servidor deve continuar rodando
 	public boolean listen = true;
-	
+
 	// Construtor para a criacao do no local com ID aleatorio
 	public ChordNode(Inet4Address ip, ChordNode sucessor, ChordNode predecessor) {
 		super();
 		this.ip = ip;
 		this.sucessor = sucessor;
 		this.predecessor = predecessor;
-		this.ID = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE,Integer.MAX_VALUE);
-		
+		this.ID = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
+
 		try {
 			this.socket = new DatagramSocket(UDP_PORT, ip);
 
@@ -94,9 +94,9 @@ public class ChordNode extends Thread {
 	public DatagramSocket getSocket() {
 		return socket;
 	}
-	
-	public void generateNewRandomID(){
-		this.ID = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE,Integer.MAX_VALUE);
+
+	public void generateNewRandomID() {
+		this.ID = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
 
 	public void run() {
@@ -125,9 +125,6 @@ public class ChordNode extends Thread {
 				continue;
 
 			// Pegando o codigo do pacote (primeiro byte)
-			// TODO: Estou admitindo que o buffer é sempre realocado quando eu
-			// chamo packetReceive
-			// e que por isso o pacote começa no começo do buffer.
 			int offset = packet.getOffset();
 
 			byte code = buffer[offset];
@@ -236,10 +233,7 @@ public class ChordNode extends Thread {
 
 		if (jrp.getStatus() == (byte) 0x00) {
 			/*
-			 * TODO: em que situação haveria um erro no Join? O caso de ID
-			 * repetido não é tratado quando fazemos o lookup e recebemos o
-			 * mesmo ID como sucessor? Além disso, o que fazer quando recebermos
-			 * um erro assim? Reenviar o Join?
+			 * Tratamos esse caso dentro da função JoinRing
 			 */
 		} else {
 			// Join sem erro.
@@ -262,7 +256,7 @@ public class ChordNode extends Thread {
 				// rede
 				// Para isso mandamos um Update
 
-				// TODO: Os dois primeiros campos vão ser iguais mesmo?
+				// Os dois primeiros campos vão ser iguais mesmo?
 				UpdatePacket up = new UpdatePacket(this.getID(), this.getID(), this.getIp());
 				sendPacket(up, this.getPredecessor().getIp());
 			}
@@ -320,18 +314,14 @@ public class ChordNode extends Thread {
 			// sucessor nem ao
 			// predecessor. Deve ter sido enviado por engano.
 
-			// TODO: Ignorar?
+			// Ignorar
 		}
 	}
 
 	public void handleLeaveResponse(LeaveResponsePacket lrp) {
 		/*
-		 * TODO: Esse caso é um pouco mais complexo. Por que receberemos pacotes
-		 * desse tipo quando estivermos saindo da rede. Então precisamos enviar
-		 * um pacote de Leave para os vizinhos e esperar 2 pacotes
-		 * LeaveResponse, um de cada um, para então sabermos que já podemos sair
-		 * efetivamente da rede. Então precisamos setar esse "OK, pode sair" em
-		 * alguma variável da classe ou algo assim.
+		 * Não fazemos nada nesse caso pois lidamos com ele separadamente dentro
+		 * da função leaveRing
 		 */
 
 		int senderID = lrp.getOriginID();
@@ -341,7 +331,6 @@ public class ChordNode extends Thread {
 		} else if (senderID == this.getPredecessor().getID()) {
 			// Predecessor OK
 		} else {
-			// Nenhum dos dois. Engano?
 			// Ignorar
 		}
 	}
@@ -500,13 +489,10 @@ public class ChordNode extends Thread {
 			ChordNode sucessor = new ChordNode(lrp.getSucessorID(), lrp.getSucessorIp());
 			this.setSucessor(sucessor);
 
-			// TODO: Esse eh o local correto de colocar isso mesmo?
 			Main.setSucessorUI(sucessor);
 
 		} else {
-			System.out.printf("ID procurado: %X \nID do sucessor: %X \nIP do sucessor: %s\n", lrp.getWantedID(),
-					lrp.getSucessorID(), lrp.getSucessorIp().toString());
-			System.out.println();
+			// No caso de recebermos a resposta apenas imprimimos na tela o pacote
 		}
 
 	}
@@ -527,14 +513,12 @@ public class ChordNode extends Thread {
 	}
 
 	public void handleUpdateResponse(UpdateResponsePacket urp) {
-
+		/*
+		 * Tratamos esse caso dentro de JoinRing
+		 */
+		
 		if (urp.getStatus() == (byte) 0x00) {
-			/*
-			 * TODO: em que situação haveria um erro no Update? Reenviar a
-			 * mensagem em caso de erro?
-			 */
 		} else {
-			// TODO: Acho que nao precisa fazer nada haha.
 		}
 
 	}
@@ -550,7 +534,6 @@ public class ChordNode extends Thread {
 		try {
 			socket.send(dp);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -619,8 +602,6 @@ public class ChordNode extends Thread {
 		while (lrp == null) {
 			byte buffer[] = new byte[21];
 
-			// TODO: Eh correto colocar o ID de origem como sendo desse kra que
-			// ainda ta fora da rede?
 			LookupPacket lp = new LookupPacket(local.getID(), local.getIp(), local.getID());
 			local.sendPacket(lp, knownHost);
 
@@ -746,13 +727,14 @@ public class ChordNode extends Thread {
 					// Ocorreu tudo bem.
 
 					try {
-						// Vamos estabelecer um timeout para o loop principal nao
+						// Vamos estabelecer um timeout para o loop principal
+						// nao
 						// ficar travado enquanto nao recebe pacotes
 						local.getSocket().setSoTimeout(ChordNode.TIMEOUT);
 					} catch (SocketException e) {
 						e.printStackTrace();
 					}
-					
+
 					Main.localNode = local;
 					local.start();
 				}
@@ -781,7 +763,6 @@ public class ChordNode extends Thread {
 		try {
 			localNode.socket.setSoTimeout(0);
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

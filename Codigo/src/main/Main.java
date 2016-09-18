@@ -1,6 +1,7 @@
 package main;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
@@ -446,7 +447,7 @@ public class Main extends Application {
 		         
 		         Optional<String> result = dialog.showAndWait();
 		         if (result.isPresent()){
-		        	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Integer.parseUnsignedInt(result.get()));
+		        	 LookupPacket lp = new LookupPacket(Main.localNode.getID(),Main.localNode.getIp(),Integer.parseUnsignedInt(result.get(),16));
 		        	 Main.localNode.sendPacket(lp,Main.localNode.getSucessor().getIp());
 		         }
 		         event.consume();
@@ -507,15 +508,16 @@ public class Main extends Application {
 		main.Main.myIp.setText(cn.getIp().getHostAddress());
 	}
 	
-	public static void showSentMessage(ChordPacket packet){
-		Main.sentMessages.add(packet.toString());
+	public static void showSentMessage(ChordPacket packet, InetAddress ip){
+		String ipFormatted = ip.toString().replace('/',' ');
+		
+		Main.sentMessages.add("To:" + ipFormatted + "\n" + packet.toString());
 	}
 	
-	public static void showReceivedMessage(ChordPacket packet){
-		/*String s = (new Long(System.currentTimeMillis())).toString() + "\n" 
-				+ packet.toString();
-		*/
-		Main.receivedMessages.add(packet.toString());
+	public static void showReceivedMessage(ChordPacket packet, InetAddress ip){
+		String ipFormatted = ip.toString().replace('/',' ');
+		
+		Main.receivedMessages.add("From:" + ipFormatted + "\n" + packet.toString());
 	}
 }
 

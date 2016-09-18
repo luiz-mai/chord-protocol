@@ -7,7 +7,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import main.Main;
 
@@ -27,15 +27,15 @@ public class ChordNode extends Thread {
 
 	// Variável que define se a thread do servidor deve continuar rodando
 	public boolean listen = true;
-
-	// Construtor para criar o nó local
-	public ChordNode(int id, Inet4Address ip, ChordNode sucessor, ChordNode predecessor) {
+	
+	// Construtor para a criacao do no local com ID aleatorio
+	public ChordNode(Inet4Address ip, ChordNode sucessor, ChordNode predecessor) {
 		super();
-		this.ID = id;
 		this.ip = ip;
 		this.sucessor = sucessor;
 		this.predecessor = predecessor;
-
+		this.ID = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE,Integer.MAX_VALUE);
+		
 		try {
 			this.socket = new DatagramSocket(UDP_PORT, ip);
 
@@ -94,6 +94,10 @@ public class ChordNode extends Thread {
 	public DatagramSocket getSocket() {
 		return socket;
 	}
+	
+	public void generateNewRandomID(){
+		this.ID = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE,Integer.MAX_VALUE);
+	}
 
 	public void run() {
 
@@ -134,49 +138,49 @@ public class ChordNode extends Thread {
 			// Join
 			case ChordPacket.JOIN_CODE:
 				JoinPacket jp = new JoinPacket(buffer, offset);
-				Main.showReceivedMessage(jp);
+				Main.showReceivedMessage(jp, incomingIp);
 				handleJoin(jp, incomingIp);
 				break;
 			// Join Response
 			case ChordPacket.JOIN_RESP_CODE:
 				JoinResponsePacket jrp = new JoinResponsePacket(buffer, offset);
-				Main.showReceivedMessage(jrp);
+				Main.showReceivedMessage(jrp, incomingIp);
 				handleJoinResponse(jrp);
 				break;
 			// Leave
 			case ChordPacket.LEAVE_CODE:
 				LeavePacket lp = new LeavePacket(buffer, offset);
-				Main.showReceivedMessage(lp);
+				Main.showReceivedMessage(lp, incomingIp);
 				handleLeave(lp);
 				break;
 			// LeaveResponse
 			case ChordPacket.LEAVE_RESP_CODE:
 				LeaveResponsePacket lrp = new LeaveResponsePacket(buffer, offset);
-				Main.showReceivedMessage(lrp);
+				Main.showReceivedMessage(lrp, incomingIp);
 				handleLeaveResponse(lrp);
 				break;
 			// Lookup
 			case ChordPacket.LOOKUP_CODE:
 				LookupPacket lkp = new LookupPacket(buffer, offset);
-				Main.showReceivedMessage(lkp);
+				Main.showReceivedMessage(lkp, incomingIp);
 				handleLookup(lkp);
 				break;
 			// LookupResponse
 			case ChordPacket.LOOKUP_RESP_CODE:
 				LookupResponsePacket lkrp = new LookupResponsePacket(buffer, offset);
-				Main.showReceivedMessage(lkrp);
+				Main.showReceivedMessage(lkrp, incomingIp);
 				handleLookupResponse(lkrp);
 				break;
 			// Update
 			case ChordPacket.UPDATE_CODE:
 				UpdatePacket up = new UpdatePacket(buffer, offset);
-				Main.showReceivedMessage(up);
+				Main.showReceivedMessage(up, incomingIp);
 				handleUpdate(up, incomingIp);
 				break;
 			// UpdateResponse
 			case ChordPacket.UPDATE_RESP_CODE:
 				UpdateResponsePacket urp = new UpdateResponsePacket(buffer, offset);
-				Main.showReceivedMessage(urp);
+				Main.showReceivedMessage(urp, incomingIp);
 				handleUpdateResponse(urp);
 				break;
 			default:
@@ -348,21 +352,21 @@ public class ChordNode extends Thread {
 		int sucID = this.getSucessor().getID();
 		int predecID = this.getPredecessor().getID();
 		int wantedID = lp.getWantedID();
-		
+
 		ChordNode wantedSuc = null;
 
 		if (Integer.compareUnsigned(localID, wantedID) == 0) {
 			// O ID procurado é igual ao ID do nó local
 			wantedSuc = this;
-			
+
 		} else if (Integer.compareUnsigned(sucID, wantedID) == 0) {
 			// O ID procurado é igual ao ID do nó sucessor
 			wantedSuc = this.getSucessor();
-			
+
 		} else if (Integer.compareUnsigned(predecID, wantedID) == 0) {
 			// O ID procurado é igual ao ID do nó predecessor
 			wantedSuc = this.getPredecessor();
-			
+
 		} else if (Integer.compareUnsigned(localID, sucID) == 0 && Integer.compareUnsigned(sucID, predecID) == 0) {
 			// Nesse caso o nó atual está sozinho na rede, entao o sucessor de
 			// qualquer ID procurado eh o ID local
@@ -375,104 +379,98 @@ public class ChordNode extends Thread {
 			// procurado.
 			//
 			// Subcaso 1: L < M
-			// 	a) P eh o menor de todos (P < L): P -> L -> M
-			// 	b) P esta entre os dois (L < P < M): L -> P -> M
-			//	c) P eh o maior de todos (P > M): L -> M -> P
+			// a) P eh o menor de todos (P < L): P -> L -> M
+			// b) P esta entre os dois (L < P < M): L -> P -> M
+			// c) P eh o maior de todos (P > M): L -> M -> P
 			//
 			// Subcaso 2: L > M
-			//	a) P eh o menor de todos (P < M): P -> M -> L
-			//	b) P esta entre os dois (M < P < L): M -> P -> L
-			//	c) P eh o maior de todos (P > L) : M -> L -> P
-			
-			if (Integer.compareUnsigned(localID,sucID) < 0){
+			// a) P eh o menor de todos (P < M): P -> M -> L
+			// b) P esta entre os dois (M < P < L): M -> P -> L
+			// c) P eh o maior de todos (P > L) : M -> L -> P
+
+			if (Integer.compareUnsigned(localID, sucID) < 0) {
 				// Subcaso 1: L < M
-				
-				if(Integer.compareUnsigned(wantedID,localID) > 0 && Integer.compareUnsigned(wantedID,sucID) < 0){
+
+				if (Integer.compareUnsigned(wantedID, localID) > 0 && Integer.compareUnsigned(wantedID, sucID) < 0) {
 					// Caso 1b
 					wantedSuc = this.getSucessor();
-				}else{
+				} else {
 					// Casos 1a e 1c (nos dois o sucessor eh L)
 					wantedSuc = this;
 				}
-			}else{
+			} else {
 				// Subcaso 2: L > M
-				if(Integer.compareUnsigned(wantedID,sucID) > 0 && Integer.compareUnsigned(wantedID,localID) < 0){
+				if (Integer.compareUnsigned(wantedID, sucID) > 0 && Integer.compareUnsigned(wantedID, localID) < 0) {
 					// Caso 2b
 					wantedSuc = this;
-				}else{
+				} else {
 					// Casos 2a e 2c (nos dois o sucessor eh M)
 					wantedSuc = this.getSucessor();
 				}
 			}
-		}else{
-			/* Esse eh o caso mais geral, para uma rede com 3 ou mais nós. Nessa situação existem 3 
-			 * subcasos com 3 ramificações cada:
-			 * A = antecessor
-			 * P = procurado
-			 * L = local
-			 * S = sucessor
+		} else {
+			/*
+			 * Esse eh o caso mais geral, para uma rede com 3 ou mais nós. Nessa
+			 * situação existem 3 subcasos com 3 ramificações cada: A =
+			 * antecessor P = procurado L = local S = sucessor
 			 * 
-			 * OBS: casos subsequentes são mutuamente exclusivos, i.e. no caso b subentende-se que o caso 
-			 * a não foi atendido (estrutura if-else)
+			 * OBS: casos subsequentes são mutuamente exclusivos, i.e. no caso b
+			 * subentende-se que o caso a não foi atendido (estrutura if-else)
 			 * 
-			 * Subcaso 1: O noh local eh o maior da rede (L > S)
-			 * 	a) P > L ou P < S : P deve ser adicionado depois de L
-			 * 		A -> L -> P -> S
-			 * 	b) P > A : P deve ser adicionado antes de L
-			 * 		A -> P -> L -> S
-			 * 	c) Nao temos informacao suficiente, encaminhar a consulta para S.
+			 * Subcaso 1: O noh local eh o maior da rede (L > S) a) P > L ou P <
+			 * S : P deve ser adicionado depois de L A -> L -> P -> S b) P > A :
+			 * P deve ser adicionado antes de L A -> P -> L -> S c) Nao temos
+			 * informacao suficiente, encaminhar a consulta para S.
 			 * 
-			 * Subcaso 2: O noh local eh o menor da rede (A > L)
-			 * 	a) P > A ou P < L : P deve ser adicionado antes de L
-			 * 		A -> P -> L -> S
-			 * 	b) P < S: P deve ser adicionado depois de L
-			 * 		A -> L -> P -> S
-			 * 	c) Nao temos informacao suficiente, encaminhar a consulta para S.
+			 * Subcaso 2: O noh local eh o menor da rede (A > L) a) P > A ou P <
+			 * L : P deve ser adicionado antes de L A -> P -> L -> S b) P < S: P
+			 * deve ser adicionado depois de L A -> L -> P -> S c) Nao temos
+			 * informacao suficiente, encaminhar a consulta para S.
 			 * 
-			 * Subcaso 3: L eh um noh intermediario
-			 * 	a) P > S ou P < A
-			 * 		Nao temos informacao suficiente, encaminhar a consulta para S.
-			 * 	b) P < L: P deve ser adicionado antes de L
-			 * 		A -> P -> L -> S
-			 * 	c) P deve ser adicionado depois de L (pois nesse caso P > L)
-			 * 		A -> L -> P -> S	
+			 * Subcaso 3: L eh um noh intermediario a) P > S ou P < A Nao temos
+			 * informacao suficiente, encaminhar a consulta para S. b) P < L: P
+			 * deve ser adicionado antes de L A -> P -> L -> S c) P deve ser
+			 * adicionado depois de L (pois nesse caso P > L) A -> L -> P -> S
 			 */
-			
-			if(Integer.compareUnsigned(localID,sucID) > 0){
+
+			if (Integer.compareUnsigned(localID, sucID) > 0) {
 				// Subcaso 1: L eh o maior da rede (L > S)
-				
-				if(Integer.compareUnsigned(wantedID,localID) > 0 || Integer.compareUnsigned(wantedID,sucID) < 0){
+
+				if (Integer.compareUnsigned(wantedID, localID) > 0 || Integer.compareUnsigned(wantedID, sucID) < 0) {
 					// Caso 1a
 					wantedSuc = this.getSucessor();
-					
-				}else if (Integer.compareUnsigned(wantedID,predecID) > 0){
+
+				} else if (Integer.compareUnsigned(wantedID, predecID) > 0) {
 					// Caso 1b
 					wantedSuc = this;
-					
-				}else{
+
+				} else {
 					// Caso 1c
-					// Temos que encaminhar o pedido, entao simplesmente deixamos o sucessor nulo
-				}		
-			}else if (Integer.compareUnsigned(predecID,localID) > 0){
+					// Temos que encaminhar o pedido, entao simplesmente
+					// deixamos o sucessor nulo
+				}
+			} else if (Integer.compareUnsigned(predecID, localID) > 0) {
 				// Subcaso 2: L eh o menor da rede (L < A)
-				
-				if (Integer.compareUnsigned(wantedID,predecID) > 0 || Integer.compareUnsigned(wantedID,localID) < 0){
+
+				if (Integer.compareUnsigned(wantedID, predecID) > 0 || Integer.compareUnsigned(wantedID, localID) < 0) {
 					// Caso 2a
 					wantedSuc = this;
-				} else if (Integer.compareUnsigned(wantedID,sucID) < 0){
+				} else if (Integer.compareUnsigned(wantedID, sucID) < 0) {
 					// Caso 2b
 					wantedSuc = this.getSucessor();
 				} else {
 					// Caso 2c
-					// Temos que encaminhar o pedido, entao simplesmente deixamos o sucessor nulo
+					// Temos que encaminhar o pedido, entao simplesmente
+					// deixamos o sucessor nulo
 				}
 			} else {
 				// Subcaso 3: L eh um noh intermediario (A < L < S)
-				
-				if(Integer.compareUnsigned(wantedID,sucID) > 0 || Integer.compareUnsigned(wantedID,predecID) < 0){
+
+				if (Integer.compareUnsigned(wantedID, sucID) > 0 || Integer.compareUnsigned(wantedID, predecID) < 0) {
 					// Caso 3a
-					// Temos que encaminhar o pedido, entao simplesmente deixamos o sucessor nulo
-				} else if (Integer.compareUnsigned(wantedID,localID) < 0){
+					// Temos que encaminhar o pedido, entao simplesmente
+					// deixamos o sucessor nulo
+				} else if (Integer.compareUnsigned(wantedID, localID) < 0) {
 					// Caso 3b
 					wantedSuc = this;
 				} else {
@@ -481,14 +479,15 @@ public class ChordNode extends Thread {
 				}
 			}
 		}
-		
-		if(wantedSuc != null){
+
+		if (wantedSuc != null) {
 			// Conseguimos definir o sucessor
 			LookupResponsePacket lrp = new LookupResponsePacket(wantedID, wantedSuc.getID(), wantedSuc.getIp());
 			sendPacket(lrp, lp.getOriginIp());
 		} else {
-			// Nao foi possivel definir o sucessor, temos que encaminhar a consulta para o sucessor
-			sendPacket(lp,this.getSucessor().getIp());
+			// Nao foi possivel definir o sucessor, temos que encaminhar a
+			// consulta para o sucessor
+			sendPacket(lp, this.getSucessor().getIp());
 		}
 	}
 
@@ -505,8 +504,8 @@ public class ChordNode extends Thread {
 			Main.setSucessorUI(sucessor);
 
 		} else {
-			System.out.printf("ID procurado: %X \nID do sucessor: %X \nIP do sucessor: %s\n", lrp.getWantedID(),lrp.getSucessorID(),
-					lrp.getSucessorIp().toString());
+			System.out.printf("ID procurado: %X \nID do sucessor: %X \nIP do sucessor: %s\n", lrp.getWantedID(),
+					lrp.getSucessorID(), lrp.getSucessorIp().toString());
 			System.out.println();
 		}
 
@@ -546,7 +545,7 @@ public class ChordNode extends Thread {
 		DatagramPacket dp = new DatagramPacket(cpArray, cpArray.length, destIP, UDP_PORT);
 
 		// Adicionar pacote enviado à GUI
-		main.Main.sentMessages.add(cp.toString());
+		Main.showSentMessage(cp, (Inet4Address) destIP);
 
 		try {
 			socket.send(dp);
@@ -582,10 +581,7 @@ public class ChordNode extends Thread {
 
 	public static ChordNode createRing(Inet4Address ipLocal) {
 
-		// Gerando id aleatoriamente
-		int id = (new Random()).nextInt();
-
-		ChordNode local = new ChordNode(id, ipLocal, null, null);
+		ChordNode local = new ChordNode(ipLocal, null, null);
 
 		// Como o nó ainda está sozinho na rede, sucessor e antecessor devem
 		// apontar pro próprio objeto
@@ -597,14 +593,6 @@ public class ChordNode extends Thread {
 		Main.setPredecessorUI(local);
 		Main.setMyselfUI(local);
 
-		/*
-		 * main.Main.sucessorID.setText(Integer.toHexString(local.getID()).
-		 * toUpperCase());
-		 * main.Main.sucessorIp.setText(local.getIp().getHostAddress());
-		 * main.Main.predecessorID.setText(Integer.toHexString(local.getID()).
-		 * toUpperCase());
-		 * main.Main.predecessorIp.setText(local.getIp().getHostAddress());
-		 */
 		local.start();
 
 		return local;
@@ -613,11 +601,16 @@ public class ChordNode extends Thread {
 	public static void joinRing(Inet4Address ipLocal, Inet4Address knownHost) {
 
 		// Gerando id aleatoriamente
-		int id = (new Random(1000)).nextInt();
 		int joinAttempts = 0;
 		int updateAttempts = 0;
+		ChordNode local = new ChordNode(ipLocal, null, null);
 
-		ChordNode local = new ChordNode(id, ipLocal, null, null);
+		// Setar o timeout do socket para 0 nesse inicio pois tudo eh sequencial
+		try {
+			local.getSocket().setSoTimeout(0);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 
 		// Passo 1: Fazer um lookup pelo ID que acabamos de criar
 
@@ -633,11 +626,7 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = local.receivePacket(buffer);
 
-			// Se o pacote recebido for nulo significa que houve um timeout e
-			// não recebemos nada
-			// Tentar novamente
-			if (packet == null)
-				continue;
+			InetAddress incomingIp = packet.getAddress();
 
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
@@ -645,11 +634,11 @@ public class ChordNode extends Thread {
 			if (code == ChordPacket.LOOKUP_RESP_CODE) {
 
 				lrp = new LookupResponsePacket(buffer, packet.getOffset());
-				Main.showReceivedMessage(lrp);
+				Main.showReceivedMessage(lrp, incomingIp);
 
 				if (lrp.getSucessorID() == local.getID()) {
 					// O ID gerado é repetido. Vamos gerar um novo.
-					local.setID((new Random(10000)).nextInt());
+					local.generateNewRandomID();
 					lrp = null;
 					continue;
 				}
@@ -678,12 +667,6 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = local.receivePacket(buffer);
 
-			// Se o pacote recebido for nulo significa que houve um timeout e
-			// não recebemos nada
-			// Tentar novamente
-			if (packet == null)
-				continue;
-
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
 
@@ -692,7 +675,7 @@ public class ChordNode extends Thread {
 				joinAttempts++;
 
 				jrp = new JoinResponsePacket(buffer, packet.getOffset());
-				Main.showReceivedMessage(jrp);
+				Main.showReceivedMessage(jrp, packet.getAddress());
 
 				if (jrp.getStatus() != 0) {
 					// Não houve erro no Join
@@ -740,12 +723,6 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = local.receivePacket(buffer);
 
-			// Se o pacote recebido for nulo significa que houve um timeout e
-			// não recebemos nada
-			// Tentar novamente
-			if (packet == null)
-				continue;
-
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
 
@@ -754,7 +731,7 @@ public class ChordNode extends Thread {
 				updateAttempts++;
 
 				urp = new UpdateResponsePacket(buffer, packet.getOffset());
-				Main.showReceivedMessage(urp);
+				Main.showReceivedMessage(urp, packet.getAddress());
 
 				if (urp.getStatus() == 0) {
 					// Houve erro no Update. Vamos tentar de novo.
@@ -767,6 +744,15 @@ public class ChordNode extends Thread {
 					continue;
 				} else {
 					// Ocorreu tudo bem.
+
+					try {
+						// Vamos estabelecer um timeout para o loop principal nao
+						// ficar travado enquanto nao recebe pacotes
+						local.getSocket().setSoTimeout(ChordNode.TIMEOUT);
+					} catch (SocketException e) {
+						e.printStackTrace();
+					}
+					
 					Main.localNode = local;
 					local.start();
 				}

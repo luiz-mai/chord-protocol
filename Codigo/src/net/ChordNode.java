@@ -590,7 +590,7 @@ public class ChordNode extends Thread {
 
 		// Setar o timeout do socket para 0 nesse inicio pois tudo eh sequencial
 		try {
-			local.getSocket().setSoTimeout(0);
+			local.getSocket().setSoTimeout(1000); // 1s de timeout
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -607,6 +607,11 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = local.receivePacket(buffer);
 
+			if(packet == null){
+				Main.sentMessages.add("Lookup provavelmente foi perdido, enviando novamente...");
+				continue;
+			}
+			
 			InetAddress incomingIp = packet.getAddress();
 
 			// Pegar o código do pacote recebido
@@ -648,6 +653,11 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = local.receivePacket(buffer);
 
+			if(packet == null){
+				Main.sentMessages.add("Join provavelmente foi perdido, enviando novamente...");
+				continue;
+			}
+			
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
 
@@ -703,6 +713,11 @@ public class ChordNode extends Thread {
 			local.sendPacket(up, predecIP);
 
 			DatagramPacket packet = local.receivePacket(buffer);
+			
+			if(packet == null){
+				Main.sentMessages.add("Update provavelmente foi perdido, enviando novamente...");
+				continue;
+			}
 
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
@@ -758,10 +773,8 @@ public class ChordNode extends Thread {
 		// vezes
 		boolean alreadySent = false;
 
-		// Vamos setar o timeout do receive para infinito para evitar perder o
-		// pacote de resposta
 		try {
-			localNode.socket.setSoTimeout(0);
+			localNode.socket.setSoTimeout(1000); // Timeout de 1s
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -777,6 +790,12 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = localNode.receivePacket(buffer);
 
+			if(packet == null){
+				Main.sentMessages.add("Leave para o sucessor provavelmente foi perdido, enviando novamente...");
+				alreadySent = false;
+				continue;
+			}
+			
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
 
@@ -806,6 +825,12 @@ public class ChordNode extends Thread {
 
 			DatagramPacket packet = localNode.receivePacket(buffer);
 
+			if(packet == null){
+				Main.sentMessages.add("Leave para o antecessor provavelmente foi perdido, enviando novamente...");
+				alreadySent = false;
+				continue;
+			}
+			
 			// Pegar o código do pacote recebido
 			byte code = ChordPacket.getPacketCode(packet);
 
